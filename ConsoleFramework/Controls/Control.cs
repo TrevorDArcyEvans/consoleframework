@@ -16,6 +16,10 @@ namespace ConsoleFramework.Controls
   [DataContextProperty("DataContext")]
   public partial class Control : INotifyPropertyChanged
   {
+    public delegate void ControlAddedEventHandler(Control control);
+
+    public delegate void ControlRemovedEventHandler(Control control);
+
     /// <summary>
     /// Часть RenderSlotRect контрола, которая в текущий момент перекрывается
     /// одним или несколькими соседями, размещёнными выше по Z-Order. Поддерживается
@@ -265,7 +269,7 @@ namespace ConsoleFramework.Controls
 
     private bool attachedToVisualTree;
 
-    protected void InsertChildAt(int index, Control child)
+    internal void InsertChildAt(int index, Control child)
     {
       if (null == child)
       {
@@ -303,7 +307,7 @@ namespace ConsoleFramework.Controls
       Invalidate();
     }
 
-    protected void RemoveChild(Control child)
+    internal void RemoveChild(Control child)
     {
       if (null == child)
       {
