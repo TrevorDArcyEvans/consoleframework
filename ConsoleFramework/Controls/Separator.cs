@@ -26,9 +26,13 @@ namespace ConsoleFramework.Controls
     {
       Attr captionAttrs;
       if (HasFocus)
+      {
         captionAttrs = Colors.Blend(Color.Black, Color.DarkGreen);
+      }
       else
+      {
         captionAttrs = Colors.Blend(Color.Black, Color.Gray);
+      }
 
       buffer.FillRectangle(0, 0, ActualWidth, ActualHeight, UnicodeTable.SingleFrameHorizontal, captionAttrs);
     }
