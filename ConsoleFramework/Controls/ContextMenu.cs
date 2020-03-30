@@ -80,11 +80,11 @@ namespace ConsoleFramework.Controls
         {
           CloseAllSubmenus();
 
-          if (args.wVirtualKeyCode == VirtualKeys.Right)
+          if (args.VirtualKeyCode == VirtualKeys.Right)
           {
             ConsoleApplication.Instance.FocusManager.MoveFocusNext();
           }
-          else if (args.wVirtualKeyCode == VirtualKeys.Left)
+          else if (args.VirtualKeyCode == VirtualKeys.Left)
           {
             ConsoleApplication.Instance.FocusManager.MoveFocusPrev();
           }

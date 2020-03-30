@@ -49,7 +49,7 @@ namespace ConsoleFramework.Controls
 
     protected virtual void OnPreviewKeyDown(object sender, KeyEventArgs args)
     {
-      if (args.wVirtualKeyCode == VirtualKeys.Tab)
+      if (args.VirtualKeyCode == VirtualKeys.Tab)
       {
         ConsoleApplication.Instance.FocusManager.MoveFocusNext();
         args.Handled = true;

@@ -507,11 +507,11 @@ namespace ConsoleFramework.Events
           ConsoleApplication.Instance.FocusManager.FocusedElement,
           keyEvent.bKeyDown ? Control.PreviewKeyDownEvent : Control.PreviewKeyUpEvent);
         eventArgs.UnicodeChar = keyEvent.UnicodeChar;
-        eventArgs.bKeyDown = keyEvent.bKeyDown;
-        eventArgs.dwControlKeyState = keyEvent.dwControlKeyState;
-        eventArgs.wRepeatCount = keyEvent.wRepeatCount;
-        eventArgs.wVirtualKeyCode = keyEvent.wVirtualKeyCode;
-        eventArgs.wVirtualScanCode = keyEvent.wVirtualScanCode;
+        eventArgs.KeyDown = keyEvent.bKeyDown;
+        eventArgs.ControlKeyState = keyEvent.dwControlKeyState;
+        eventArgs.RepeatCount = keyEvent.wRepeatCount;
+        eventArgs.VirtualKeyCode = keyEvent.wVirtualKeyCode;
+        eventArgs.VirtualScanCode = keyEvent.wVirtualScanCode;
         _eventsQueue.Enqueue(eventArgs);
       }
     }
@@ -724,11 +724,11 @@ namespace ConsoleFramework.Events
           var argsNew = new KeyEventArgs(args.Source, Control.KeyDownEvent);
           var keyEventArgs = ((KeyEventArgs) args);
           argsNew.UnicodeChar = keyEventArgs.UnicodeChar;
-          argsNew.bKeyDown = keyEventArgs.bKeyDown;
-          argsNew.dwControlKeyState = keyEventArgs.dwControlKeyState;
-          argsNew.wRepeatCount = keyEventArgs.wRepeatCount;
-          argsNew.wVirtualKeyCode = keyEventArgs.wVirtualKeyCode;
-          argsNew.wVirtualScanCode = keyEventArgs.wVirtualScanCode;
+          argsNew.KeyDown = keyEventArgs.KeyDown;
+          argsNew.ControlKeyState = keyEventArgs.ControlKeyState;
+          argsNew.RepeatCount = keyEventArgs.RepeatCount;
+          argsNew.VirtualKeyCode = keyEventArgs.VirtualKeyCode;
+          argsNew.VirtualScanCode = keyEventArgs.VirtualScanCode;
           argsNew.Handled = args.Handled;
           _eventsQueue.Enqueue(argsNew);
         }
@@ -738,11 +738,11 @@ namespace ConsoleFramework.Events
           var argsNew = new KeyEventArgs(args.Source, Control.KeyUpEvent);
           var keyEventArgs = ((KeyEventArgs) args);
           argsNew.UnicodeChar = keyEventArgs.UnicodeChar;
-          argsNew.bKeyDown = keyEventArgs.bKeyDown;
-          argsNew.dwControlKeyState = keyEventArgs.dwControlKeyState;
-          argsNew.wRepeatCount = keyEventArgs.wRepeatCount;
-          argsNew.wVirtualKeyCode = keyEventArgs.wVirtualKeyCode;
-          argsNew.wVirtualScanCode = keyEventArgs.wVirtualScanCode;
+          argsNew.KeyDown = keyEventArgs.KeyDown;
+          argsNew.ControlKeyState = keyEventArgs.ControlKeyState;
+          argsNew.RepeatCount = keyEventArgs.RepeatCount;
+          argsNew.VirtualKeyCode = keyEventArgs.VirtualKeyCode;
+          argsNew.VirtualScanCode = keyEventArgs.VirtualScanCode;
           argsNew.Handled = args.Handled;
           _eventsQueue.Enqueue(argsNew);
         }

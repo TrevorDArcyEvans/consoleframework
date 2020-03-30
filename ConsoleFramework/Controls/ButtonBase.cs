@@ -66,8 +66,8 @@ namespace ConsoleFramework.Controls
         return;
       }
 
-      if (args.wVirtualKeyCode == VirtualKeys.Space
-          || args.wVirtualKeyCode == VirtualKeys.Return)
+      if (args.VirtualKeyCode == VirtualKeys.Space
+          || args.VirtualKeyCode == VirtualKeys.Return)
       {
         RaiseEvent(ClickEvent, new RoutedEventArgs(this, ClickEvent));
         if (_command != null && _command.CanExecute(CommandParameter))

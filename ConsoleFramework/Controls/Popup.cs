@@ -64,12 +64,12 @@ namespace ConsoleFramework.Controls
 
     protected override void OnPreviewKeyDown(object sender, KeyEventArgs args)
     {
-      switch (args.wVirtualKeyCode)
+      switch (args.VirtualKeyCode)
       {
         case VirtualKeys.Right:
         {
           KeyEventArgs newArgs = new KeyEventArgs(this, ControlKeyPressedEvent);
-          newArgs.wVirtualKeyCode = args.wVirtualKeyCode;
+          newArgs.VirtualKeyCode = args.VirtualKeyCode;
           RaiseEvent(ControlKeyPressedEvent, newArgs);
           args.Handled = true;
           break;
@@ -78,7 +78,7 @@ namespace ConsoleFramework.Controls
         case VirtualKeys.Left:
         {
           KeyEventArgs newArgs = new KeyEventArgs(this, ControlKeyPressedEvent);
-          newArgs.wVirtualKeyCode = args.wVirtualKeyCode;
+          newArgs.VirtualKeyCode = args.VirtualKeyCode;
           RaiseEvent(ControlKeyPressedEvent, newArgs);
           args.Handled = true;
           break;

@@ -40,9 +40,9 @@ namespace ConsoleFramework.Events
         }
 
         public bool Matches( KeyEventArgs args ) {
-            VirtualKeys wVirtualKeyCode = args.wVirtualKeyCode;
+            VirtualKeys wVirtualKeyCode = args.VirtualKeyCode;
             if ( this.Key != wVirtualKeyCode ) return false;
-            ControlKeyState controlKeyState = args.dwControlKeyState;
+            ControlKeyState controlKeyState = args.ControlKeyState;
             ModifierKeys modifierKeys = this.Modifiers;
 
             // Проверяем все возможные модификаторы по очереди

@@ -310,17 +310,17 @@ namespace ConsoleFramework.Controls
         return;
       }
 
-      if (args.wVirtualKeyCode == VirtualKeys.PageUp)
+      if (args.VirtualKeyCode == VirtualKeys.PageUp)
       {
         PageUpCore(PageSize);
       }
 
-      if (args.wVirtualKeyCode == VirtualKeys.PageDown)
+      if (args.VirtualKeyCode == VirtualKeys.PageDown)
       {
         pageDownCore(PageSize);
       }
 
-      if (args.wVirtualKeyCode == VirtualKeys.Up)
+      if (args.VirtualKeyCode == VirtualKeys.Up)
       {
         if (AllItemsAreDisabled) return;
         do
@@ -338,7 +338,7 @@ namespace ConsoleFramework.Controls
         CurrentItemShouldBeVisibleAtTop();
       }
 
-      if (args.wVirtualKeyCode == VirtualKeys.Down)
+      if (args.VirtualKeyCode == VirtualKeys.Down)
       {
         if (AllItemsAreDisabled)
         {

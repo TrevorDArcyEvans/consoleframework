@@ -220,9 +220,9 @@ namespace ConsoleFramework.Controls
             CloseAllSubmenus();
             //
             ConsoleApplication.Instance.FocusManager.SetFocusScope(this);
-            if (args.wVirtualKeyCode == VirtualKeys.Right)
+            if (args.VirtualKeyCode == VirtualKeys.Right)
               ConsoleApplication.Instance.FocusManager.MoveFocusNext();
-            else if (args.wVirtualKeyCode == VirtualKeys.Left)
+            else if (args.VirtualKeyCode == VirtualKeys.Left)
               ConsoleApplication.Instance.FocusManager.MoveFocusPrev();
             MenuItem focusedItem = (MenuItem) this.Items.SingleOrDefault(
               item => item is MenuItem && item.HasFocus);
@@ -246,13 +246,13 @@ namespace ConsoleFramework.Controls
 
     private void onKeyDown(object sender, KeyEventArgs args)
     {
-      if (args.wVirtualKeyCode == VirtualKeys.Right)
+      if (args.VirtualKeyCode == VirtualKeys.Right)
       {
         ConsoleApplication.Instance.FocusManager.MoveFocusNext();
         args.Handled = true;
       }
 
-      if (args.wVirtualKeyCode == VirtualKeys.Left)
+      if (args.VirtualKeyCode == VirtualKeys.Left)
       {
         ConsoleApplication.Instance.FocusManager.MoveFocusPrev();
         args.Handled = true;

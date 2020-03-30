@@ -60,7 +60,7 @@ namespace ConsoleFramework.Controls
       EventManager.AddHandler(_listbox, KeyDownEvent, new KeyEventHandler(
         (sender, args) =>
         {
-          if (args.wVirtualKeyCode == VirtualKeys.Return)
+          if (args.VirtualKeyCode == VirtualKeys.Return)
           {
             IndexSelected = _listbox.SelectedItemIndex;
             Close();
@@ -93,7 +93,7 @@ namespace ConsoleFramework.Controls
 
     private void OnKeyDown(object sender, KeyEventArgs args)
     {
-      if (args.wVirtualKeyCode == VirtualKeys.Escape)
+      if (args.VirtualKeyCode == VirtualKeys.Escape)
       {
         Close();
       }

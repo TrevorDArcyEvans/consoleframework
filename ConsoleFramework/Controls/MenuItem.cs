@@ -146,7 +146,7 @@ namespace ConsoleFramework.Controls
 
     private void OnKeyDown(object sender, KeyEventArgs args)
     {
-      if (args.wVirtualKeyCode == VirtualKeys.Return)
+      if (args.VirtualKeyCode == VirtualKeys.Return)
       {
         if (Type == MenuItemType.RootSubmenu || Type == MenuItemType.Submenu)
         {
