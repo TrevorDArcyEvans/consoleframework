@@ -1,3 +1,4 @@
+using System;
 using ConsoleFramework.Core;
 
 namespace ConsoleFramework.Controls
