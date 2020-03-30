@@ -68,22 +68,22 @@
 
     public static Point operator +(Point point, Vector vector)
     {
-      return new Point(point._x + vector.x, point._y + vector.y);
+      return new Point(point._x + vector._x, point._y + vector._y);
     }
 
     public static Point Add(Point point, Vector vector)
     {
-      return new Point(point._x + vector.x, point._y + vector.y);
+      return new Point(point._x + vector._x, point._y + vector._y);
     }
 
     public static Point operator -(Point point, Vector vector)
     {
-      return new Point(point._x - vector.x, point._y - vector.y);
+      return new Point(point._x - vector._x, point._y - vector._y);
     }
 
     public static Point Subtract(Point point, Vector vector)
     {
-      return new Point(point._x - vector.x, point._y - vector.y);
+      return new Point(point._x - vector._x, point._y - vector._y);
     }
 
     public static Vector operator -(Point point1, Point point2)

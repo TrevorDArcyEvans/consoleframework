@@ -1099,7 +1099,7 @@ namespace ConsoleFramework.Controls
           for (;;)
           {
             var actualOffset = currentControl.ActualOffset;
-            point.Offset(-actualOffset.X, -actualOffset.y);
+            point.Offset(-actualOffset.X, -actualOffset._y);
             if (currentControl.Parent == null)
             {
               break;
@@ -1117,7 +1117,7 @@ namespace ConsoleFramework.Controls
           for (;;)
           {
             Vector actualOffset = currentControl.ActualOffset;
-            point.Offset(actualOffset.X, actualOffset.y);
+            point.Offset(actualOffset.X, actualOffset._y);
             if (currentControl.Parent == null)
               break;
             currentControl = currentControl.Parent;
@@ -1140,7 +1140,7 @@ namespace ConsoleFramework.Controls
         while (currentControl != ancestor)
         {
           var actualOffset = currentControl.ActualOffset;
-          point.Offset(actualOffset.X, actualOffset.y);
+          point.Offset(actualOffset.X, actualOffset._y);
           currentControl = currentControl.Parent;
         }
 
@@ -1149,7 +1149,7 @@ namespace ConsoleFramework.Controls
         while (currentControl != ancestor)
         {
           var actualOffset = currentControl.ActualOffset;
-          point.Offset(-actualOffset.X, -actualOffset.y);
+          point.Offset(-actualOffset.X, -actualOffset._y);
           currentControl = currentControl.Parent;
         }
 
@@ -1237,12 +1237,12 @@ namespace ConsoleFramework.Controls
       // hit testing - calculate position in child according to specified layout attributes
       var actualOffset = ActualOffset;
       var renderSlotRect = RenderSlotRect;
-      var virtualSlotRect = new Rect(new Point(actualOffset.x, actualOffset.y), RenderSize);
+      var virtualSlotRect = new Rect(new Point(actualOffset._x, actualOffset._y), RenderSize);
       if (!LayoutClip.IsEmpty)
       {
         var layoutClip = LayoutClip;
         var location = layoutClip.Location;
-        location.Offset(actualOffset.x, actualOffset.y);
+        location.Offset(actualOffset._x, actualOffset._y);
         layoutClip.Location = location;
         virtualSlotRect.Intersect(layoutClip);
       }
@@ -1275,12 +1275,12 @@ namespace ConsoleFramework.Controls
       // hit testing - calculate position in child according to specified layout attributes
       var actualOffset = child.ActualOffset;
       var renderSlotRect = child.RenderSlotRect;
-      var virtualSlotRect = new Rect(new Point(actualOffset.x, actualOffset.y), child.RenderSize);
+      var virtualSlotRect = new Rect(new Point(actualOffset._x, actualOffset._y), child.RenderSize);
       if (!child.LayoutClip.IsEmpty)
       {
         var layoutClip = child.LayoutClip;
         var location = layoutClip.Location;
-        location.Offset(actualOffset.x, actualOffset.y);
+        location.Offset(actualOffset._x, actualOffset._y);
         layoutClip.Location = location;
         virtualSlotRect.Intersect(layoutClip);
       }

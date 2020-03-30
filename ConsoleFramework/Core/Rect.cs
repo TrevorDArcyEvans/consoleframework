@@ -463,8 +463,8 @@ namespace ConsoleFramework.Core
         throw new InvalidOperationException("Rect_CannotCallMethod");
       }
 
-      this._x += offsetVector.x;
-      this._y += offsetVector.y;
+      this._x += offsetVector._x;
+      this._y += offsetVector._y;
     }
 
     public void Offset(int offsetX, int offsetY)

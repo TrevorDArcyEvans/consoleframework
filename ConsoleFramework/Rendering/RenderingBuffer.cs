@@ -123,10 +123,10 @@ namespace ConsoleFramework.Rendering
 
             for ( int x = finalRect.Left; x < finalRect.Right; x++ ) {
                 int parentX = x;
-                int childX = parentX - actualOffset.x;
+                int childX = parentX - actualOffset._x;
                 for ( int y = finalRect.Top; y < finalRect.Bottom; y++ ) {
                     int parentY = y;
-                    int childY = parentY - actualOffset.y;
+                    int childY = parentY - actualOffset._y;
 
                     CHAR_INFO charInfo = childBuffer.buffer[childX, childY];
                     int opacity = childBuffer.opacityMatrix[childX, childY];
