@@ -109,7 +109,7 @@ namespace ConsoleFramework.Controls
       }
     }
 
-    protected override void initialize()
+    protected override void Initialize()
     {
       AddHandler(PreviewKeyDownEvent, new KeyEventHandler(OnPreviewKeyDown), true);
     }

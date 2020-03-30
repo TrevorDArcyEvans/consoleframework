@@ -25,10 +25,10 @@ namespace ConsoleFramework.Controls
     {
       this.IsFocusScope = true;
       AddHandler(PreviewMouseDownEvent, new MouseButtonEventHandler(Window_OnPreviewMouseDown));
-      initialize();
+      Initialize();
     }
 
-    protected virtual void initialize()
+    protected virtual void Initialize()
     {
       AddHandler(MouseDownEvent, new MouseButtonEventHandler(Window_OnMouseDown));
       AddHandler(MouseUpEvent, new MouseButtonEventHandler(Window_OnMouseUp));
