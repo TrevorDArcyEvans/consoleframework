@@ -366,9 +366,9 @@ namespace ConsoleFramework.Rendering
             RenderingBuffer fullBuffer = getOrCreateFullBufferForControl(control);
             // replace buffers if control has grown
             LayoutInfo layoutInfo = control.LayoutInfo;
-            if (layoutInfo.renderSize.width > buffer.Width || layoutInfo.renderSize.height > buffer.Height) {
-                buffer = new RenderingBuffer(layoutInfo.renderSize.width, layoutInfo.renderSize.height);
-                fullBuffer = new RenderingBuffer(layoutInfo.renderSize.width, layoutInfo.renderSize.height);
+            if (layoutInfo.renderSize._width > buffer.Width || layoutInfo.renderSize._height > buffer.Height) {
+                buffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
+                fullBuffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
                 buffers[control] = buffer;
                 fullBuffers[control] = fullBuffer;
             }
@@ -435,9 +435,9 @@ namespace ConsoleFramework.Rendering
                 return fullBuffer;
             }
             // replace buffers if control has grown
-            if (layoutInfo.renderSize.width > buffer.Width || layoutInfo.renderSize.height > buffer.Height) {
-                buffer = new RenderingBuffer(layoutInfo.renderSize.width, layoutInfo.renderSize.height);
-                fullBuffer = new RenderingBuffer(layoutInfo.renderSize.width, layoutInfo.renderSize.height);
+            if (layoutInfo.renderSize._width > buffer.Width || layoutInfo.renderSize._height > buffer.Height) {
+                buffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
+                fullBuffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
                 buffers[control] = buffer;
                 fullBuffers[control] = fullBuffer;
             }

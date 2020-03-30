@@ -138,7 +138,7 @@ namespace ConsoleFramework.Rendering
 
         public NestedIndexer this[int index] {
             get {
-                if (index < 0 || index >= size.width) {
+                if (index < 0 || index >= size._width) {
                     throw new IndexOutOfRangeException("index exceeds specified buffer _width.");
                 }
                 if (cachedIndexers.ContainsKey(index)) {

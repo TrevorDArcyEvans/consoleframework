@@ -110,8 +110,8 @@ namespace ConsoleFramework.Core
       {
         this._x = location._x;
         this._y = location._y;
-        this._width = size.width;
-        this._height = size.height;
+        this._width = size._width;
+        this._height = size._height;
       }
     }
 
@@ -204,8 +204,8 @@ namespace ConsoleFramework.Core
             throw new InvalidOperationException("Rect_CannotModifyEmptyRect");
           }
 
-          this._width = value.width;
-          this._height = value.height;
+          this._width = value._width;
+          this._height = value._height;
         }
       }
     }
@@ -492,7 +492,7 @@ namespace ConsoleFramework.Core
 
     public void Inflate(Size size)
     {
-      this.Inflate(size.width, size.height);
+      this.Inflate(size._width, size._height);
     }
 
     public void Inflate(int _width, int _height)
@@ -516,7 +516,7 @@ namespace ConsoleFramework.Core
 
     public static Rect Inflate(Rect rect, Size size)
     {
-      rect.Inflate(size.width, size.height);
+      rect.Inflate(size._width, size._height);
       return rect;
     }
 
