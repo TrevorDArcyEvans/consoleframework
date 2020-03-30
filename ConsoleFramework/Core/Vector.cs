@@ -109,11 +109,11 @@ namespace ConsoleFramework.Core {
         }
 
         public static Point operator +(Vector vector, Point point) {
-            return new Point(point.x + vector.x, point.y + vector.y);
+            return new Point(point._x + vector.x, point._y + vector.y);
         }
 
         public static Point Add(Vector vector, Point point) {
-            return new Point(point.x + vector.x, point.y + vector.y);
+            return new Point(point._x + vector.x, point._y + vector.y);
         }
 
         public static Vector operator *(Vector vector, int scalar) {

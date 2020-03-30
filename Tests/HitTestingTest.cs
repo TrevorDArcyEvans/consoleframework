@@ -43,7 +43,7 @@ namespace Tests
         [Fact]
         public void TestNormalSituation() {
             //
-            TestControl x = new TestControl() { Name = "x" };
+            TestControl x = new TestControl() { Name = "_x" };
             TestControl ancestor = new TestControl() { Name = "ancestor" };
             x.AddChild( ancestor );
             TestControl a = new TestControl() { Name = "a" };

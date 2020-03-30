@@ -68,7 +68,7 @@ namespace ConsoleFramework.Native
         internal static extern int curs_set(CursorVisibility cursorVisibility);
         
         /// <summary>
-        /// Moves the cursor associated with the window to line y and column x.
+        /// Moves the cursor associated with the window to line _y and column _x.
         /// This routine does not move the physical cursor of the terminal until refresh is called.
         /// The position specified is relative to the upper left-hand corner of the window, which is (0,0).
         /// </summary>

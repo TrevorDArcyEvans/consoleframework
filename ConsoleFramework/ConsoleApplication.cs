@@ -335,9 +335,9 @@ namespace ConsoleFramework
         internal void SetCursorPosition (Point position)
         {
             if (!usingLinux) {                
-                Win32.SetConsoleCursorPosition (stdOutputHandle, new COORD ((short)position.x, (short)position.y));
+                Win32.SetConsoleCursorPosition (stdOutputHandle, new COORD ((short)position._x, (short)position._y));
             } else {
-                NCurses.move (position.y, position.x);
+                NCurses.move (position._y, position._x);
                 NCurses.refresh ();
             }
         }

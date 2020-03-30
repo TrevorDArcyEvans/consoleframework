@@ -32,7 +32,7 @@ namespace Tests.Xaml {
             var obj = XamlParser.CreateFromXaml<TestObject>(
                 @"
 <test:TestObject xmlns:test=""clr-namespace:Tests.Xaml;assembly=Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null""
-        xmlns:x=""http://consoleframework.org/xaml.xsd""
+        xmlns:_x=""http://consoleframework.org/xaml.xsd""
         CustomDataContext=""{Binding Path=SubModel, Mode=OneTime}"">
     <test:TestObject Content=""{Binding Path=Title, Mode=OneTime}""/>
 </test:TestObject>

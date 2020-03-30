@@ -245,10 +245,10 @@ namespace ConsoleFramework.Rendering
             //
             for (int x = 0; x < rectToCopy.width; x++) {
                 int bufferX = x + rectToCopy.x;
-                int canvasX = x + rectToCopy.x + offset.x;
+                int canvasX = x + rectToCopy.x + offset._x;
                 for (int y = 0; y < rectToCopy.height; y++) {
                     int bufferY = y + rectToCopy.y;
-                    int canvasY = y + rectToCopy.y + offset.y;
+                    int canvasY = y + rectToCopy.y + offset._y;
                     CHAR_INFO charInfo = buffer[bufferX, bufferY];
                     canvas[canvasX][canvasY].Assign(charInfo);
                 }

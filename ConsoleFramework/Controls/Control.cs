@@ -1408,7 +1408,7 @@ namespace ConsoleFramework.Controls
     /// <param name="buffer">Буфер вывода</param>
     /// <param name="x">X-координата, с которой начинать вывод строки</param>
     /// <param name="y">Y-координата</param>
-    /// <param name="maxWidth">Доступная для вывода ширина (начиная с x). То есть x + maxWidth не должен
+    /// <param name="maxWidth">Доступная для вывода ширина (начиная с _x). То есть _x + maxWidth не должен
     /// превышать ActualWidth контрола</param>
     /// <param name="attr">Атрибуты</param>
     /// <returns>Количество реально выведенных в буфер пикселей, min(s.len, maxWidth)</returns>
