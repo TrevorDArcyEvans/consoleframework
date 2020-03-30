@@ -37,7 +37,7 @@ namespace Tests
                 VerticalAlignment = verticalAlignment
             };
             Size inkSize = new Size(inkWidth, inkHeight);
-            Vector offset = control.computeAlignmentOffsetCore(new Size(10, 10), inkSize);
+            Vector offset = control.ComputeAlignmentOffsetCore(new Size(10, 10), inkSize);
             Assert.Equal(new Vector(expectedX, expectedY), offset);
         }
 
@@ -46,7 +46,7 @@ namespace Tests
             Control control = new Control {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 MaxWidth = 3,
-                layoutInfo = new LayoutInfo {
+                LayoutInfo = new LayoutInfo {
                     renderSize = new Size(10, 1)
                 }
             };
