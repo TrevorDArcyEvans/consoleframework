@@ -77,23 +77,23 @@ namespace ConsoleFramework.Controls
       }
     }
 
-    private string title;
+    private string _title;
 
     public string Title
     {
-      get { return title; }
+      get { return _title; }
       set
       {
-        if (title != value)
+        if (_title != value)
         {
-          title = value;
+          _title = value;
           Invalidate();
           RaisePropertyChanged("Title");
         }
       }
     }
 
-    protected WindowsHost getWindowsHost()
+    protected WindowsHost GetWindowsHost()
     {
       return (WindowsHost) Parent;
     }
@@ -111,8 +111,8 @@ namespace ConsoleFramework.Controls
       }
 
       // Reserve 2 pixels for frame and 2/1 pixels for shadow
-      int width = availableSize.Width != int.MaxValue ? Math.Max(4, availableSize.Width) - 4 : int.MaxValue;
-      int height = availableSize.Height != int.MaxValue ? Math.Max(3, availableSize.Height) - 3 : int.MaxValue;
+      var width = availableSize.Width != int.MaxValue ? Math.Max(4, availableSize.Width) - 4 : int.MaxValue;
+      var height = availableSize.Height != int.MaxValue ? Math.Max(3, availableSize.Height) - 3 : int.MaxValue;
       Content.Measure(new Size(width, height));
 
       // Avoid int overflow. Additional -1 to avoid returning int.MaxValue from MeasureOverride (by contract)
@@ -144,6 +144,7 @@ namespace ConsoleFramework.Controls
         buffer.SetPixel(b.X, b.Y, UnicodeTable.SingleFrameBottomRightCorner, attrs);
         buffer.SetPixel(a.X, b.Y, UnicodeTable.SingleFrameBottomLeftCorner, attrs);
         buffer.SetPixel(b.X, a.Y, UnicodeTable.SingleFrameTopRightCorner, attrs);
+
         // Horizontal & vertical frames
         buffer.FillRectangle(a.X + 1, a.Y, b.X - a.X - 1, 1, UnicodeTable.SingleFrameHorizontal, attrs);
         buffer.FillRectangle(a.X + 1, b.Y, b.X - a.X - 1, 1, UnicodeTable.SingleFrameHorizontal, attrs);
@@ -157,6 +158,7 @@ namespace ConsoleFramework.Controls
         buffer.SetPixel(b.X, b.Y, UnicodeTable.DoubleFrameBottomRightCorner, attrs);
         buffer.SetPixel(a.X, b.Y, UnicodeTable.DoubleFrameBottomLeftCorner, attrs);
         buffer.SetPixel(b.X, a.Y, UnicodeTable.DoubleFrameTopRightCorner, attrs);
+
         // Horizontal & vertical frames
         buffer.FillRectangle(a.X + 1, a.Y, b.X - a.X - 1, 1, UnicodeTable.DoubleFrameHorizontal, attrs);
         buffer.FillRectangle(a.X + 1, b.Y, b.X - a.X - 1, 1, UnicodeTable.DoubleFrameHorizontal, attrs);
@@ -167,19 +169,21 @@ namespace ConsoleFramework.Controls
 
     public override void Render(RenderingBuffer buffer)
     {
-      Attr borderAttrs = moving ? Colors.Blend(Color.Green, Color.Gray) : Colors.Blend(Color.White, Color.Gray);
-      if (getWindowsHost().TopWindow == this)
+      var borderAttrs = _moving ? Colors.Blend(Color.Green, Color.Gray) : Colors.Blend(Color.White, Color.Gray);
+      if (GetWindowsHost().TopWindow == this)
       {
         borderAttrs = Colors.Blend(Color.DarkBlue, Color.Gray);
       }
 
       // background
       buffer.FillRectangle(0, 0, this.ActualWidth, this.ActualHeight, ' ', borderAttrs);
+
       // Borders
-      Point bottomRight = new Point(ActualWidth - 3, ActualHeight - 2);
-      RenderBorders(buffer, new Point(0, 0), bottomRight, this.moving || this.resizing, borderAttrs);
-      // Additional green right bottom corner if resizing
-      if (resizing)
+      var bottomRight = new Point(ActualWidth - 3, ActualHeight - 2);
+      RenderBorders(buffer, new Point(0, 0), bottomRight, this._moving || this._resizing, borderAttrs);
+
+      // Additional green right bottom corner if _resizing
+      if (_resizing)
       {
         buffer.SetPixel(bottomRight.X, bottomRight.Y, UnicodeTable.SingleFrameBottomRightCorner,
           Colors.Blend(Color.Green, Color.Gray));
@@ -189,7 +193,7 @@ namespace ConsoleFramework.Controls
       if (ActualWidth > 4)
       {
         buffer.SetPixel(2, 0, '[');
-        buffer.SetPixel(3, 0, showClosingGlyph ? UnicodeTable.WindowClosePressedSymbol : UnicodeTable.WindowCloseSymbol,
+        buffer.SetPixel(3, 0, _showClosingGlyph ? UnicodeTable.WindowClosePressedSymbol : UnicodeTable.WindowCloseSymbol,
           Colors.Blend(Color.Green, Color.Gray));
         buffer.SetPixel(4, 0, ']');
       }
@@ -201,19 +205,20 @@ namespace ConsoleFramework.Controls
       buffer.SetOpacity(ActualWidth - 2, 0, 2 + 4);
       buffer.SetOpacityRect(2, ActualHeight - 1, ActualWidth - 2, 1, 1 + 4);
       buffer.SetOpacityRect(ActualWidth - 2, 1, 2, ActualHeight - 1, 1 + 4);
-      // title
+
+      // _title
       if (!string.IsNullOrEmpty(Title))
       {
-        int titleStartX = 7;
-        bool renderTitle = false;
+        var titleStartX = 7;
+        var renderTitle = false;
         string renderTitleString = null;
-        int availablePixelsCount = ActualWidth - titleStartX * 2;
+        var availablePixelsCount = ActualWidth - titleStartX * 2;
         if (availablePixelsCount > 0)
         {
           renderTitle = true;
           if (Title.Length <= availablePixelsCount)
           {
-            // dont truncate title
+            // dont truncate _title
             titleStartX += (availablePixelsCount - Title.Length) / 2;
             renderTitleString = Title;
           }
@@ -233,9 +238,8 @@ namespace ConsoleFramework.Controls
 
         if (renderTitle)
         {
-          // assert !string.IsNullOrEmpty(renderingTitleString);
           buffer.SetPixel(titleStartX - 1, 0, ' ', borderAttrs);
-          for (int i = 0; i < renderTitleString.Length; i++)
+          for (var i = 0; i < renderTitleString.Length; i++)
           {
             buffer.SetPixel(titleStartX + i, 0, renderTitleString[i], borderAttrs);
           }
@@ -245,54 +249,54 @@ namespace ConsoleFramework.Controls
       }
     }
 
-    private bool closing = false;
-    private bool showClosingGlyph = false;
+    private bool _closing = false;
+    private bool _showClosingGlyph = false;
 
-    private bool moving = false;
-    private int movingStartX;
-    private int movingStartY;
-    private Point movingStartPoint;
+    private bool _moving = false;
+    private int _movingStartX;
+    private int _movingStartY;
+    private Point _movingStartPoint;
 
-    private bool resizing = false;
-    private int resizingStartWidth;
-    private int resizingStartHeight;
-    private Point resizingStartPoint;
+    private bool _resizing = false;
+    private int _resizingStartWidth;
+    private int _resizingStartHeight;
+    private Point _resizingStartPoint;
 
     public void Window_OnMouseDown(object sender, MouseButtonEventArgs args)
     {
-      // Moving is enabled only when windows is not resizing, and vice versa
-      if (!moving && !resizing && !closing)
+      // Moving is enabled only when windows is not _resizing, and vice versa
+      if (!_moving && !_resizing && !_closing)
       {
-        Point point = args.GetPosition(this);
-        Point parentPoint = args.GetPosition(getWindowsHost());
+        var point = args.GetPosition(this);
+        var parentPoint = args.GetPosition(GetWindowsHost());
         if (point.y == 0 && point.x == 3)
         {
-          closing = true;
-          showClosingGlyph = true;
+          _closing = true;
+          _showClosingGlyph = true;
           ConsoleApplication.Instance.BeginCaptureInput(this);
-          // closing is started, we should redraw the border
+          // _closing is started, we should redraw the border
           Invalidate();
           args.Handled = true;
         }
         else if (point.y == 0)
         {
-          moving = true;
-          movingStartPoint = parentPoint;
-          movingStartX = RenderSlotRect.TopLeft.X;
-          movingStartY = RenderSlotRect.TopLeft.Y;
+          _moving = true;
+          _movingStartPoint = parentPoint;
+          _movingStartX = RenderSlotRect.TopLeft.X;
+          _movingStartY = RenderSlotRect.TopLeft.Y;
           ConsoleApplication.Instance.BeginCaptureInput(this);
-          // moving is started, we should redraw the border
+          // _moving is started, we should redraw the border
           Invalidate();
           args.Handled = true;
         }
         else if (point.x == ActualWidth - 3 && point.y == ActualHeight - 2)
         {
-          resizing = true;
-          resizingStartPoint = parentPoint;
-          resizingStartWidth = ActualWidth;
-          resizingStartHeight = ActualHeight;
+          _resizing = true;
+          _resizingStartPoint = parentPoint;
+          _resizingStartWidth = ActualWidth;
+          _resizingStartHeight = ActualHeight;
           ConsoleApplication.Instance.BeginCaptureInput(this);
-          // resizing is started, we should redraw the border
+          // _resizing is started, we should redraw the border
           Invalidate();
           args.Handled = true;
         }
@@ -312,13 +316,13 @@ namespace ConsoleFramework.Controls
 
       if (!args.Cancel)
       {
-        getWindowsHost().CloseWindow(this);
+        GetWindowsHost().CloseWindow(this);
       }
     }
 
     public void Window_OnMouseUp(object sender, MouseButtonEventArgs args)
     {
-      if (closing)
+      if (_closing)
       {
         Point point = args.GetPosition(this);
         if (point.x == 3 && point.y == 0)
@@ -326,24 +330,24 @@ namespace ConsoleFramework.Controls
           this.HandleClosing();
         }
 
-        closing = false;
-        showClosingGlyph = false;
+        _closing = false;
+        _showClosingGlyph = false;
         ConsoleApplication.Instance.EndCaptureInput(this);
         Invalidate();
         args.Handled = true;
       }
 
-      if (moving)
+      if (_moving)
       {
-        moving = false;
+        _moving = false;
         ConsoleApplication.Instance.EndCaptureInput(this);
         Invalidate();
         args.Handled = true;
       }
 
-      if (resizing)
+      if (_resizing)
       {
-        resizing = false;
+        _resizing = false;
         ConsoleApplication.Instance.EndCaptureInput(this);
         Invalidate();
         args.Handled = true;
@@ -352,23 +356,23 @@ namespace ConsoleFramework.Controls
 
     public void Window_OnMouseMove(object sender, MouseEventArgs args)
     {
-      if (closing)
+      if (_closing)
       {
-        Point point = args.GetPosition(this);
-        bool anyChanged = false;
+        var point = args.GetPosition(this);
+        var anyChanged = false;
         if (point.x == 3 && point.y == 0)
         {
-          if (!showClosingGlyph)
+          if (!_showClosingGlyph)
           {
-            showClosingGlyph = true;
+            _showClosingGlyph = true;
             anyChanged = true;
           }
         }
         else
         {
-          if (showClosingGlyph)
+          if (_showClosingGlyph)
           {
-            showClosingGlyph = false;
+            _showClosingGlyph = false;
             anyChanged = true;
           }
         }
@@ -378,24 +382,24 @@ namespace ConsoleFramework.Controls
         args.Handled = true;
       }
 
-      if (moving)
+      if (_moving)
       {
-        Point parentPoint = args.GetPosition(getWindowsHost());
-        Vector vector = new Vector(parentPoint.X - movingStartPoint.x, parentPoint.Y - movingStartPoint.y);
-        X = movingStartX + vector.X;
-        Y = movingStartY + vector.Y;
-        getWindowsHost().Invalidate();
+        var parentPoint = args.GetPosition(GetWindowsHost());
+        var vector = new Vector(parentPoint.X - _movingStartPoint.x, parentPoint.Y - _movingStartPoint.y);
+        X = _movingStartX + vector.X;
+        Y = _movingStartY + vector.Y;
+        GetWindowsHost().Invalidate();
         args.Handled = true;
       }
 
-      if (resizing)
+      if (_resizing)
       {
-        Point parentPoint = args.GetPosition(getWindowsHost());
-        int deltaWidth = parentPoint.X - resizingStartPoint.x;
-        int deltaHeight = parentPoint.Y - resizingStartPoint.y;
-        int width = resizingStartWidth + deltaWidth;
-        int height = resizingStartHeight + deltaHeight;
-        bool anyChanged = false;
+        var parentPoint = args.GetPosition(GetWindowsHost());
+        var deltaWidth = parentPoint.X - _resizingStartPoint.x;
+        var deltaHeight = parentPoint.Y - _resizingStartPoint.y;
+        var width = _resizingStartWidth + deltaWidth;
+        var height = _resizingStartHeight + deltaHeight;
+        var anyChanged = false;
         if (width >= 4)
         {
           this.Width = width;
@@ -409,7 +413,10 @@ namespace ConsoleFramework.Controls
         }
 
         if (anyChanged)
+        {
           Invalidate();
+        }
+
         args.Handled = true;
       }
     }
