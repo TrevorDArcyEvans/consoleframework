@@ -190,7 +190,7 @@ namespace ConsoleFramework.Events {
 
         private Point lastMousePosition;
 
-        // Auto-repeating mouse left click when holding pressed button
+        // Auto-repeating mouse left click when holding _pressed button
         private bool autoRepeatTimerRunning = false;
         private Timer timer;
         private MouseButtonEventArgs lastMousePressEventArgs;

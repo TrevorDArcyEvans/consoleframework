@@ -51,7 +51,7 @@ namespace ConsoleFramework.Controls
         }
       }
 
-      if (pressed || pressedUsingKeyboard)
+      if (_pressed || _pressedUsingKeyboard)
       {
         buffer.FillRectangle(1, 0, ActualWidth - 1, ActualHeight - 1, ' ', captionAttrs);
         buffer.SetOpacityRect(0, 0, 1, ActualHeight, 3);

@@ -614,7 +614,7 @@ namespace ConsoleFramework
         
         private void processLinuxInput (TermKeyKey key)
         {
-            // If any special button has been pressed (Tab, Enter, etc)
+            // If any special button has been _pressed (Tab, Enter, etc)
             // we should convert its code to INPUT_RECORD.KeyEvent
             // Because INPUT_RECORD.KeyEvent depends on Windows' scan codes,
             // we convert codes retrieved from LibTermKey to Windows virtual scan codes

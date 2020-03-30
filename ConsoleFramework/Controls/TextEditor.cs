@@ -35,7 +35,7 @@ namespace ConsoleFramework.Controls {
 
         /// <summary>
         /// Gap shown after typing last character in line if there is no remaining space
-        /// (and when End key was pressed)
+        /// (and when End key was _pressed)
         /// </summary>
         public const int COLUMNS_RIGHT_MAX_GAP = 3;
 
@@ -58,7 +58,7 @@ namespace ConsoleFramework.Controls {
 
         /// <summary>
         /// Stores the last X coord of cursor, before line was changed
-        /// (when PageUp/PageDown/ArrowUp/ArrowDown pressed)
+        /// (when PageUp/PageDown/ArrowUp/ArrowDown _pressed)
         /// </summary>
         private int lastTextPosX;
 
