@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using ConsoleFramework.Core;
 using ConsoleFramework.Events;
-using ConsoleFramework.Native;
 using ConsoleFramework.Rendering;
 
 namespace ConsoleFramework.Controls
@@ -29,10 +27,10 @@ namespace ConsoleFramework.Controls
       AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDown));
       HorizontalScrollEnabled = true;
       VerticalScrollEnabled = true;
-      AddHandler(ContentShouldBeScrolledEvent, new ContentShouldBeScrolledEventHandler(onContentShouldBeScrolled));
+      AddHandler(ContentShouldBeScrolledEvent, new ContentShouldBeScrolledEventHandler(OnContentShouldBeScrolled));
     }
 
-    private void onContentShouldBeScrolled(object sender, ContentShouldBeScrolledEventArgs args)
+    private void OnContentShouldBeScrolled(object sender, ContentShouldBeScrolledEventArgs args)
     {
       if (args.MostLeftVisibleX.HasValue)
       {
@@ -167,20 +165,28 @@ namespace ConsoleFramework.Controls
       }
     }
 
+    private int _deltaX;
+
     public int DeltaX
     {
       get { return _deltaX; }
     }
+
+    private int _deltaY;
 
     public int DeltaY
     {
       get { return _deltaY; }
     }
 
+    private bool _horizontalScrollVisible = false;
+
     public bool HorizontalScrollVisible
     {
       get { return _horizontalScrollVisible; }
     }
+
+    private bool _verticalScrollVisible = false;
 
     public bool VerticalScrollVisible
     {
@@ -313,12 +319,6 @@ namespace ConsoleFramework.Controls
         _content = value;
       }
     }
-
-    private bool _horizontalScrollVisible = false;
-    private bool _verticalScrollVisible = false;
-
-    private int _deltaX;
-    private int _deltaY;
 
     protected override Size MeasureOverride(Size availableSize)
     {
