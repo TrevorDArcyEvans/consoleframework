@@ -19,7 +19,7 @@ namespace ConsoleFramework.Native
     /// </summary>
     [DllImport("libc.so.6", SetLastError = true)]
     public static extern int poll([In, Out]
-      pollfd[] fds, int fdsCount, int timeout);
+      PollFd[] fds, int fdsCount, int timeout);
 
     /// <summary>
     /// Creates a pipe object. fds must be initialized array of 2 _items.
@@ -84,7 +84,7 @@ namespace ConsoleFramework.Native
     /// Used in terminal size retrieving.
     /// </summary>
     [DllImport("libc.so.6", SetLastError = true)]
-    public static extern int ioctl(int fd, int cmd, out winsize ws);
+    public static extern int ioctl(int fd, int cmd, out Winsize ws);
 
     /// <summary>
     /// Interrupted system call. If after poll() error code is EINTR, this means
@@ -97,9 +97,9 @@ namespace ConsoleFramework.Native
     /// </summary>
     /// <param name="isDarwin">True if application is executed under Mac OS X.</param>
     /// <returns></returns>
-    public static winsize GetTerminalSize(bool isDarwin)
+    public static Winsize GetTerminalSize(bool isDarwin)
     {
-      winsize ws;
+      Winsize ws;
       ioctl(STDIN_FILENO, isDarwin ? TIOCGWINSZ_DARWIN : TIOCGWINSZ_LINUX, out ws);
       return ws;
     }
@@ -114,7 +114,7 @@ namespace ConsoleFramework.Native
     /// </summary>
     [DllImport("libc.so.6", SetLastError = true)]
     public static extern int tcgetattr(int fd, [Out]
-      out termios termios);
+      out Termios termios);
 
     /// <summary>
     /// Upon successful completion, the functions tcgetattr() and tcsetattr() 
@@ -122,7 +122,7 @@ namespace ConsoleFramework.Native
     /// errno is set to indicate the error.
     /// </summary>
     [DllImport("libc.so.6", SetLastError = true)]
-    public static extern int tcsetattr(int fd, int optional_actions, ref termios termios);
+    public static extern int tcsetattr(int fd, int optional_actions, ref Termios termios);
 
     /// <summary>
     /// The change occurs immediately.
@@ -140,66 +140,5 @@ namespace ConsoleFramework.Native
     /// and all input that has been received but not read will be discarded before the change is made.
     /// </summary>
     public const Int32 TCSAFLUSH = 2;
-  }
-
-  [StructLayout(LayoutKind.Sequential)]
-  public struct termios
-  {
-    public UInt32 c_iflag;
-    public UInt32 c_oflag;
-    public UInt32 c_cflag;
-    public UInt32 c_lflag;
-    public Byte c_line;
-
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-    public Byte[] c_cc; // 32 _items
-
-    public UInt32 c_ispeed;
-    public UInt32 c_ospeed;
-  }
-
-  /// <summary>
-  /// Structure to retrieve terminal size.
-  /// </summary>
-  public struct winsize
-  {
-    public UInt16 ws_row;
-    public UInt16 ws_col;
-    public UInt16 ws_xpixel;
-    public UInt16 ws_ypixel;
-  }
-
-  [Flags]
-  public enum EVENTFD_FLAGS : int
-  {
-    EFD_SEMAPHORE = 0x00000001,
-    EFD_CLOEXEC = 0x00080000,
-    EEFD_NONBLOCK = 0x00000800
-  }
-
-  [StructLayout(LayoutKind.Sequential)]
-  public struct pollfd
-  {
-    public int fd;
-    public POLL_EVENTS events;
-    public POLL_EVENTS revents;
-  }
-
-
-  [Flags]
-  public enum POLL_EVENTS : ushort
-  {
-    NONE = 0x0000,
-    POLLIN = 0x001,
-    POLLPRI = 0x002,
-    POLLOUT = 0x004,
-    POLLMSG = 0x400,
-    POLLREMOVE = 0x1000,
-    POLLRDHUP = 0x2000,
-
-    // output only
-    POLLERR = 0x008,
-    POLLHUP = 0x010,
-    POLLNVAL = 0x020
   }
 }
