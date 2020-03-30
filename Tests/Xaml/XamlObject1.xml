@@ -1,12 +1,12 @@
 ﻿<object TypeName="Tests.Xaml.XamlTest+XamlObject, Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
-        _xmlns:_x="http://consoleframework.org/_xaml._xsd">
+        __xmlns:__x="http://consoleframework.org/__xaml.__xsd">
   <!-- First ctor argument -->
-  <int _x:Key="1">5</int>
+  <int __x:Key="1">5</int>
   <!-- StrProp property -->
-  <string _x:Key="StrProp">str</string>
+  <string __x:Key="StrProp">str</string>
   <!-- Content property - nested object -->
-  <object _x:Key="Content" TypeName="Tests.Xaml.XamlTest+XamlObject, Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+  <object __x:Key="Content" TypeName="Tests.Xaml.XamlTest+XamlObject, Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
     <!-- Syntax with empty element -->
-    <int _x:Key="1" Content="10"/>
+    <int __x:Key="1" Content="10"/>
   </object>
 </object>

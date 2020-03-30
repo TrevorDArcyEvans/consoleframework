@@ -67,7 +67,7 @@ namespace ConsoleFramework.Rendering
             public CHAR_INFO_ref this[int index] {
                 get {
                     if (index < 0 || index >= canvas.size.Height) {
-                        throw new IndexOutOfRangeException("index exceeds specified buffer height.");
+                        throw new IndexOutOfRangeException("index exceeds specified buffer _height.");
                     }
                     if (references.ContainsKey(index)) {
                         return references[index];
@@ -139,7 +139,7 @@ namespace ConsoleFramework.Rendering
         public NestedIndexer this[int index] {
             get {
                 if (index < 0 || index >= size.width) {
-                    throw new IndexOutOfRangeException("index exceeds specified buffer width.");
+                    throw new IndexOutOfRangeException("index exceeds specified buffer _width.");
                 }
                 if (cachedIndexers.ContainsKey(index)) {
                     return cachedIndexers[index];
@@ -163,18 +163,18 @@ namespace ConsoleFramework.Rendering
         public virtual void Flush(Rect affectedRect) {
             if (stdOutputHandle != IntPtr.Zero) {
                 // we are in windows environment
-                SMALL_RECT rect = new SMALL_RECT((short) affectedRect.x, (short) affectedRect.y,
-                    (short) (affectedRect.width + affectedRect.x), (short) (affectedRect.height + affectedRect.y));
+                SMALL_RECT rect = new SMALL_RECT((short) affectedRect._x, (short) affectedRect._y,
+                    (short) (affectedRect._width + affectedRect._x), (short) (affectedRect._height + affectedRect._y));
                 if (!Win32.WriteConsoleOutputCore(stdOutputHandle, buffer, new COORD((short) size.Width, (short) size.Height),
-                    new COORD((short) affectedRect.x, (short) affectedRect.y), ref rect)) {
+                    new COORD((short) affectedRect._x, (short) affectedRect._y), ref rect)) {
                     throw new InvalidOperationException(string.Format("Cannot write to console : {0}", Win32.GetLastErrorMessage()));
                 }
             } else {
                 // we are in linux
-                for (int i = 0; i < affectedRect.width; i++) {
-                    int x = i + affectedRect.x;
-                    for (int j = 0; j < affectedRect.height; j++) {
-                        int y = j + affectedRect.y;
+                for (int i = 0; i < affectedRect._width; i++) {
+                    int x = i + affectedRect._x;
+                    for (int j = 0; j < affectedRect._height; j++) {
+                        int y = j + affectedRect._y;
                         // todo : convert attributes and optimize rendering
                         bool fgIntensity;
                         short index = NCurses.winAttrsToNCursesAttrs(buffer[y, x].Attributes,

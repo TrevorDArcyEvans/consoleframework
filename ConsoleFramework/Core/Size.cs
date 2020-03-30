@@ -41,7 +41,7 @@ namespace ConsoleFramework.Core {
 
         public Size(int width, int height) {
             if (width < 0 || height < 0) {
-                throw new ArgumentException("Width and height cannot be negative");
+                throw new ArgumentException("Width and _height cannot be negative");
             }
             this.width = width;
             this.height = height;

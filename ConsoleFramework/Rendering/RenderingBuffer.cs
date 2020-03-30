@@ -243,12 +243,12 @@ namespace ConsoleFramework.Rendering
             rectToCopy.Intersect(canvasRect);
             rectToCopy.Intersect(bufferRect);
             //
-            for (int x = 0; x < rectToCopy.width; x++) {
-                int bufferX = x + rectToCopy.x;
-                int canvasX = x + rectToCopy.x + offset._x;
-                for (int y = 0; y < rectToCopy.height; y++) {
-                    int bufferY = y + rectToCopy.y;
-                    int canvasY = y + rectToCopy.y + offset._y;
+            for (int x = 0; x < rectToCopy._width; x++) {
+                int bufferX = x + rectToCopy._x;
+                int canvasX = x + rectToCopy._x + offset._x;
+                for (int y = 0; y < rectToCopy._height; y++) {
+                    int bufferY = y + rectToCopy._y;
+                    int canvasY = y + rectToCopy._y + offset._y;
                     CHAR_INFO charInfo = buffer[bufferX, bufferY];
                     canvas[canvasX][canvasY].Assign(charInfo);
                 }
@@ -284,9 +284,9 @@ namespace ConsoleFramework.Rendering
         /// новые пиксели со старыми, которые были получены при предыдущем вызове рендеринга).
         /// </summary>
         public bool ContainsOpacity(Rect affectedRect) {
-            for (int x = 0; x < affectedRect.width; x++) {
-                for (int y = 0; y < affectedRect.height; y++) {
-                    if (opacityMatrix[x + affectedRect.x, y + affectedRect.y] != 0) {
+            for (int x = 0; x < affectedRect._width; x++) {
+                for (int y = 0; y < affectedRect._height; y++) {
+                    if (opacityMatrix[x + affectedRect._x, y + affectedRect._y] != 0) {
                         return true;
                     }
                 }
