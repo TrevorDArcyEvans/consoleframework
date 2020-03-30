@@ -311,7 +311,7 @@ namespace ConsoleFramework.Rendering
         }
 
         private bool checkDesiredSizeNotChangedRecursively( Control control ) {
-            if ( control.lastLayoutInfo.unclippedDesiredSize != control.layoutInfo.unclippedDesiredSize ) {
+            if ( control.LastLayoutInfo.unclippedDesiredSize != control.LayoutInfo.unclippedDesiredSize ) {
                 return false;
             }
             foreach ( Control child in control.Children ) {
@@ -322,7 +322,7 @@ namespace ConsoleFramework.Rendering
         }
 
         private void updateLayout(Control control, List<Control> revalidatedControls) {
-            LayoutInfo lastLayoutInfo = control.lastLayoutInfo;
+            LayoutInfo lastLayoutInfo = control.LastLayoutInfo;
             // работаем с родительским элементом управления
             if (control.Parent != null) {
                 bool needUpdateParentLayout = true;
@@ -365,7 +365,7 @@ namespace ConsoleFramework.Rendering
             RenderingBuffer buffer = getOrCreateBufferForControl(control);
             RenderingBuffer fullBuffer = getOrCreateFullBufferForControl(control);
             // replace buffers if control has grown
-            LayoutInfo layoutInfo = control.layoutInfo;
+            LayoutInfo layoutInfo = control.LayoutInfo;
             if (layoutInfo.renderSize.width > buffer.Width || layoutInfo.renderSize.height > buffer.Height) {
                 buffer = new RenderingBuffer(layoutInfo.renderSize.width, layoutInfo.renderSize.height);
                 fullBuffer = new RenderingBuffer(layoutInfo.renderSize.width, layoutInfo.renderSize.height);
@@ -410,8 +410,8 @@ namespace ConsoleFramework.Rendering
         }
 
         private bool checkRenderingWasNotChangedRecursively( Control control ) {
-            if ( !control.lastLayoutInfo.Equals( control.layoutInfo ) 
-                || control.lastLayoutInfo.validity != LayoutValidity.Render ) return false;
+            if ( !control.LastLayoutInfo.Equals( control.LayoutInfo ) 
+                || control.LastLayoutInfo.validity != LayoutValidity.Render ) return false;
             foreach ( Control child in control.Children ) {
                 if ( !checkRenderingWasNotChangedRecursively( child ) ) return false;
             }
@@ -422,8 +422,8 @@ namespace ConsoleFramework.Rendering
             RenderingBuffer buffer = getOrCreateBufferForControl(control);
             RenderingBuffer fullBuffer = getOrCreateFullBufferForControl(control);
             //
-            LayoutInfo lastLayoutInfo = control.lastLayoutInfo;
-            LayoutInfo layoutInfo = control.layoutInfo;
+            LayoutInfo lastLayoutInfo = control.LastLayoutInfo;
+            LayoutInfo layoutInfo = control.LayoutInfo;
             //
             control.Measure(lastLayoutInfo.measureArgument);
             control.Arrange(lastLayoutInfo.renderSlotRect);
