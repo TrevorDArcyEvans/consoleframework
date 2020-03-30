@@ -9,94 +9,113 @@ using Xaml;
 
 namespace ConsoleFramework.Controls
 {
-    [ContentProperty( "Items" )]
-    public class ContextMenu
+  [ContentProperty("Items")]
+  public class ContextMenu
+  {
+    private readonly ObservableList<MenuItemBase> _items = new ObservableList<MenuItemBase>(new List<MenuItemBase>());
+
+    public IList<MenuItemBase> Items
     {
-        private readonly ObservableList< MenuItemBase > items = new ObservableList< MenuItemBase >(
-            new List< MenuItemBase >( ) );
-
-        public IList< MenuItemBase > Items {
-            get { return items; }
-        }
-
-        private MenuItem.Popup popup;
-        private bool expanded;
-
-        private bool popupShadow = true;
-        public bool PopupShadow {
-            get { return popupShadow; }
-            set { popupShadow = value; }
-        }
-
-        /// <summary>
-        /// Forces all open submenus to be closed.
-        /// </summary>
-        public void CloseAllSubmenus( ) {
-            List<MenuItem> expandedSubmenus = new List< MenuItem >();
-            MenuItem currentItem = ( MenuItem ) this.Items.SingleOrDefault(
-                item => item is MenuItem && ((MenuItem)item).expanded);
-            while ( null != currentItem ) {
-                expandedSubmenus.Add( currentItem );
-                currentItem = (MenuItem)currentItem.Items.SingleOrDefault(
-                    item => item is MenuItem && ((MenuItem)item).expanded);
-            }
-            expandedSubmenus.Reverse( );
-            foreach ( MenuItem expandedSubmenu in expandedSubmenus ) {
-                expandedSubmenu.Close( );
-            }
-        }
-
-        private WindowsHost windowsHost;
-        private RoutedEventHandler windowsHostClick;
-        private KeyEventHandler windowsHostControlKeyPressed;
-
-        public void OpenMenu( WindowsHost windowsHost, Point point ) {
-            if ( expanded ) return;
-
-            // Вешаем на WindowsHost обработчик события MenuItem.ClickEvent,
-            // чтобы ловить момент выбора пункта меню в одном из модальных всплывающих окошек
-            // Дело в том, что эти окошки не являются дочерними элементами контрола Menu,
-            // а напрямую являются дочерними элементами WindowsHost (т.к. именно он создаёт
-            // окна). И событие выбора пункта меню из всплывающего окошка может быть поймано 
-            // в WindowsHost, но не в Menu. А нам нужно повесить обработчик, который закроет
-            // все показанные попапы.
-            EventManager.AddHandler( windowsHost, MenuItem.ClickEvent,
-                windowsHostClick = ( sender, args ) => {
-                    CloseAllSubmenus( );
-                    popup.Close(  );
-                }, true );
-
-            EventManager.AddHandler( windowsHost, MenuItem.Popup.ControlKeyPressedEvent,
-                windowsHostControlKeyPressed = ( sender, args ) => {
-                    CloseAllSubmenus( );
-                    //
-                    //ConsoleApplication.Instance.FocusManager.SetFocusScope(this);
-                    if ( args.wVirtualKeyCode == VirtualKeys.Right )
-                        ConsoleApplication.Instance.FocusManager.MoveFocusNext( );
-                    else if ( args.wVirtualKeyCode == VirtualKeys.Left )
-                        ConsoleApplication.Instance.FocusManager.MoveFocusPrev( );
-                    MenuItem focusedItem = ( MenuItem ) this.Items.SingleOrDefault(
-                        item => item is MenuItem && item.HasFocus );
-                    focusedItem.Expand( );
-                } );
-
-            if ( null == popup ) {
-                popup = new MenuItem.Popup( this.Items, this.popupShadow, 0 );
-                popup.AddHandler( Window.ClosedEvent, new EventHandler( onPopupClosed ) );
-            }
-            popup.X = point.X;
-            popup.Y = point.Y;
-            windowsHost.ShowModal( popup, true );
-            expanded = true;
-            this.windowsHost = windowsHost;
-        }
-
-        private void onPopupClosed( object sender, EventArgs eventArgs ) {
-            if (!expanded) throw new InvalidOperationException("This shouldn't happen");
-            expanded = false;
-            EventManager.RemoveHandler( windowsHost, MenuItem.ClickEvent, windowsHostClick );
-            EventManager.RemoveHandler( windowsHost, MenuItem.Popup.ControlKeyPressedEvent,
-                windowsHostControlKeyPressed );
-        }
+      get { return _items; }
     }
+
+    private Popup _popup;
+    private bool _expanded;
+
+    private bool _popupShadow = true;
+
+    public bool PopupShadow
+    {
+      get { return _popupShadow; }
+      set { _popupShadow = value; }
+    }
+
+    /// <summary>
+    /// Forces all open submenus to be closed.
+    /// </summary>
+    public void CloseAllSubmenus()
+    {
+      var expandedSubmenus = new List<MenuItem>();
+      var currentItem = (MenuItem) this.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).expanded);
+      while (null != currentItem)
+      {
+        expandedSubmenus.Add(currentItem);
+        currentItem = (MenuItem) currentItem.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).expanded);
+      }
+
+      expandedSubmenus.Reverse();
+      foreach (var expandedSubmenu in expandedSubmenus)
+      {
+        expandedSubmenu.Close();
+      }
+    }
+
+    private WindowsHost _windowsHost;
+    private RoutedEventHandler _windowsHostClick;
+    private KeyEventHandler _windowsHostControlKeyPressed;
+
+    public void OpenMenu(WindowsHost windowsHost, Point point)
+    {
+      if (_expanded)
+      {
+        return;
+      }
+
+      // Вешаем на WindowsHost обработчик события MenuItem.ClickEvent,
+      // чтобы ловить момент выбора пункта меню в одном из модальных всплывающих окошек
+      // Дело в том, что эти окошки не являются дочерними элементами контрола Menu,
+      // а напрямую являются дочерними элементами WindowsHost (т.к. именно он создаёт
+      // окна). И событие выбора пункта меню из всплывающего окошка может быть поймано 
+      // в WindowsHost, но не в Menu. А нам нужно повесить обработчик, который закроет
+      // все показанные попапы.
+      EventManager.AddHandler(windowsHost, MenuItem.ClickEvent,
+        _windowsHostClick = (sender, args) =>
+        {
+          CloseAllSubmenus();
+          _popup.Close();
+        }, true);
+
+      EventManager.AddHandler(windowsHost, Popup.ControlKeyPressedEvent,
+        _windowsHostControlKeyPressed = (sender, args) =>
+        {
+          CloseAllSubmenus();
+
+          if (args.wVirtualKeyCode == VirtualKeys.Right)
+          {
+            ConsoleApplication.Instance.FocusManager.MoveFocusNext();
+          }
+          else if (args.wVirtualKeyCode == VirtualKeys.Left)
+          {
+            ConsoleApplication.Instance.FocusManager.MoveFocusPrev();
+          }
+
+          var focusedItem = (MenuItem) this.Items.SingleOrDefault(item => item is MenuItem && item.HasFocus);
+          focusedItem.Expand();
+        });
+
+      if (null == _popup)
+      {
+        _popup = new Popup(this.Items, this._popupShadow, 0);
+        _popup.AddHandler(Window.ClosedEvent, new EventHandler(OnPopupClosed));
+      }
+
+      _popup.X = point.X;
+      _popup.Y = point.Y;
+      windowsHost.ShowModal(_popup, true);
+      _expanded = true;
+      this._windowsHost = windowsHost;
+    }
+
+    private void OnPopupClosed(object sender, EventArgs eventArgs)
+    {
+      if (!_expanded)
+      {
+        throw new InvalidOperationException("This shouldn't happen");
+      }
+
+      _expanded = false;
+      EventManager.RemoveHandler(_windowsHost, MenuItem.ClickEvent, _windowsHostClick);
+      EventManager.RemoveHandler(_windowsHost, Popup.ControlKeyPressedEvent, _windowsHostControlKeyPressed);
+    }
+  }
 }
