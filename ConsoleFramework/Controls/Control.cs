@@ -194,7 +194,7 @@ namespace ConsoleFramework.Controls
 
     /// <summary>
     /// Read-only collection of children controls ordered by Z-Order.
-    /// (Last items will be on top.)
+    /// (Last _items will be on top.)
     /// </summary>
     protected internal IList<Control> Children;
 

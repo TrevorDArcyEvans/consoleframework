@@ -80,7 +80,7 @@ namespace ConsoleFramework.Controls
 
       path.Reverse();
 
-      // Open all menu items in path successively
+      // Open all menu _items in path successively
       int i = 0;
       Action action = null;
       action = new Action(() =>

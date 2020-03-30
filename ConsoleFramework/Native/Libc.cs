@@ -21,7 +21,7 @@ namespace ConsoleFramework.Native
         public static extern int poll( [In, Out] pollfd[] fds, int fdsCount, int timeout);
 
         /// <summary>
-        /// Creates a pipe object. fds must be initialized array of 2 items.
+        /// Creates a pipe object. fds must be initialized array of 2 _items.
         /// fds[0] will store descriptor for reading
         /// fds[1] will store descriptor for writing
         /// </summary>
@@ -146,7 +146,7 @@ namespace ConsoleFramework.Native
         public UInt32 c_lflag;
         public Byte c_line;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public Byte[] c_cc;  // 32 items
+        public Byte[] c_cc;  // 32 _items
         public UInt32 c_ispeed;
         public UInt32 c_ospeed;
     }

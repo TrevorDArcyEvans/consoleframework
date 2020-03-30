@@ -17,7 +17,7 @@ namespace ConsoleFramework.Controls
       RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(Popup));
 
     /// <summary>
-    /// Call this method to remove all menu items that are used as child items.
+    /// Call this method to remove all menu _items that are used as child _items.
     /// It is necessary before reuse MenuItems in another Popup instance.
     /// </summary>
     public void DisconnectMenuItems()

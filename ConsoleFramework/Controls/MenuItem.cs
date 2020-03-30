@@ -21,7 +21,7 @@ namespace ConsoleFramework.Controls
     public MenuItem ParentItem { get; internal set; }
 
     /// <summary>
-    /// Call this method if you have changed menu items set
+    /// Call this method if you have changed menu _items set
     /// after menu popup has been shown.
     /// </summary>
     public void ReinitializePopup()
