@@ -174,7 +174,7 @@ namespace ConsoleFramework.Core
           return null;
         }
 
-        var _opacity = ConsoleApplication.Instance.Renderer.getControlOpacityAt(control, localPoint.X, localPoint.Y);
+        var _opacity = ConsoleApplication.Instance.Renderer.GetControlOpacityAt(control, localPoint.X, localPoint.Y);
         if (_opacity >= 4 && _opacity <= 7)
         {
           return null;
