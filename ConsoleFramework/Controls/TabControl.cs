@@ -17,10 +17,10 @@ namespace ConsoleFramework.Controls
     public TabControl()
     {
       _controls = new UIElementCollection(this);
-      AddHandler(MouseDownEvent, new MouseButtonEventHandler(mouseDown));
+      AddHandler(MouseDownEvent, new MouseButtonEventHandler(TabControl_MouseDown));
     }
 
-    private void mouseDown(object sender, MouseButtonEventArgs args)
+    private void TabControl_MouseDown(object sender, MouseButtonEventArgs args)
     {
       var pos = args.GetPosition(this);
       if (pos.Y > 2)
@@ -163,7 +163,7 @@ namespace ConsoleFramework.Controls
       return finalSize;
     }
 
-    private void renderBorderSafe(RenderingBuffer buffer, int x, int y, int x2, int y2)
+    private void RenderBorderSafe(RenderingBuffer buffer, int x, int y, int x2, int y2)
     {
       if (ActualWidth > x && ActualHeight > y)
       {
@@ -232,7 +232,7 @@ namespace ConsoleFramework.Controls
         buffer.SetOpacityRect(1, 3, ActualWidth - 2, ActualHeight - 4, 2);
       }
 
-      renderBorderSafe(buffer, 0, 2, Math.Max(GetTabHeaderWidth() - 1, ActualWidth - 1), ActualHeight - 1);
+      RenderBorderSafe(buffer, 0, 2, Math.Max(GetTabHeaderWidth() - 1, ActualWidth - 1), ActualHeight - 1);
 
       // Start to render header
       buffer.FillRectangle(0, 0, ActualWidth, Math.Min(2, ActualHeight), ' ', attr);
