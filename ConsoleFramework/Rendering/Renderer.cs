@@ -354,7 +354,7 @@ namespace ConsoleFramework.Rendering
 
     private static bool CheckDesiredSizeNotChangedRecursively(Control control)
     {
-      if (control.LastLayoutInfo.unclippedDesiredSize != control.LayoutInfo.unclippedDesiredSize)
+      if (control.LastLayoutInfo.UnclippedDesiredSize != control.LayoutInfo.UnclippedDesiredSize)
       {
         return false;
       }
@@ -381,9 +381,9 @@ namespace ConsoleFramework.Rendering
         // вверх по дереву элементов, и мы переходим к работе с дочерними элементами
         // в противном случае мы добавляем родительский элемент в конец очереди ревалидации, и
         // возвращаем управление
-        if (lastLayoutInfo.validity != LayoutValidity.Nothing)
+        if (lastLayoutInfo.Validity != LayoutValidity.Nothing)
         {
-          control.Measure(lastLayoutInfo.measureArgument);
+          control.Measure(lastLayoutInfo.MeasureArgument);
           if (CheckDesiredSizeNotChangedRecursively(control))
           {
             needUpdateParentLayout = false;
@@ -402,7 +402,7 @@ namespace ConsoleFramework.Rendering
 
       // работаем с дочерними элементами управления
       // вызываем для текущего контрола Measure&Arrange с последними значениями аргументов
-      if (lastLayoutInfo.validity == LayoutValidity.Nothing && control.Parent != null)
+      if (lastLayoutInfo.Validity == LayoutValidity.Nothing && control.Parent != null)
       {
         throw new InvalidOperationException("Assertion failed.");
       }
@@ -420,8 +420,8 @@ namespace ConsoleFramework.Rendering
       }
       else
       {
-        control.Measure(lastLayoutInfo.measureArgument);
-        control.Arrange(lastLayoutInfo.renderSlotRect);
+        control.Measure(lastLayoutInfo.MeasureArgument);
+        control.Arrange(lastLayoutInfo.RenderSlotRect);
       }
 
       // update render buffers of current control and its children
@@ -429,10 +429,10 @@ namespace ConsoleFramework.Rendering
       var fullBuffer = GetOrCreateFullBufferForControl(control);
       // replace buffers if control has grown
       var layoutInfo = control.LayoutInfo;
-      if (layoutInfo.renderSize.Width > buffer.Width || layoutInfo.renderSize.Height > buffer.Height)
+      if (layoutInfo.RenderSize.Width > buffer.Width || layoutInfo.RenderSize.Height > buffer.Height)
       {
-        buffer = new RenderingBuffer(layoutInfo.renderSize.Width, layoutInfo.renderSize.Height);
-        fullBuffer = new RenderingBuffer(layoutInfo.renderSize.Width, layoutInfo.renderSize.Height);
+        buffer = new RenderingBuffer(layoutInfo.RenderSize.Width, layoutInfo.RenderSize.Height);
+        fullBuffer = new RenderingBuffer(layoutInfo.RenderSize.Width, layoutInfo.RenderSize.Height);
         _buffers[control] = buffer;
         _fullBuffers[control] = fullBuffer;
       }
@@ -488,7 +488,7 @@ namespace ConsoleFramework.Rendering
     private bool CheckRenderingWasNotChangedRecursively(Control control)
     {
       if (!control.LastLayoutInfo.Equals(control.LayoutInfo)
-          || control.LastLayoutInfo.validity != LayoutValidity.Render) return false;
+          || control.LastLayoutInfo.Validity != LayoutValidity.Render) return false;
       foreach (var child in control.Children)
       {
         if (!CheckRenderingWasNotChangedRecursively(child)) return false;
@@ -505,8 +505,8 @@ namespace ConsoleFramework.Rendering
       var lastLayoutInfo = control.LastLayoutInfo;
       var layoutInfo = control.LayoutInfo;
 
-      control.Measure(lastLayoutInfo.measureArgument);
-      control.Arrange(lastLayoutInfo.renderSlotRect);
+      control.Measure(lastLayoutInfo.MeasureArgument);
+      control.Arrange(lastLayoutInfo.RenderSlotRect);
       // if lastLayoutInfo eq layoutInfo we can use last rendered buffer
       if (CheckRenderingWasNotChangedRecursively(control))
       {
@@ -519,10 +519,10 @@ namespace ConsoleFramework.Rendering
       }
 
       // replace buffers if control has grown
-      if (layoutInfo.renderSize.Width > buffer.Width || layoutInfo.renderSize.Height > buffer.Height)
+      if (layoutInfo.RenderSize.Width > buffer.Width || layoutInfo.RenderSize.Height > buffer.Height)
       {
-        buffer = new RenderingBuffer(layoutInfo.renderSize.Width, layoutInfo.renderSize.Height);
-        fullBuffer = new RenderingBuffer(layoutInfo.renderSize.Width, layoutInfo.renderSize.Height);
+        buffer = new RenderingBuffer(layoutInfo.RenderSize.Width, layoutInfo.RenderSize.Height);
+        fullBuffer = new RenderingBuffer(layoutInfo.RenderSize.Width, layoutInfo.RenderSize.Height);
         _buffers[control] = buffer;
         _fullBuffers[control] = fullBuffer;
       }
