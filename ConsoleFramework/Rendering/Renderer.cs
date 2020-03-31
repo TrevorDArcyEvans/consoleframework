@@ -105,7 +105,7 @@ namespace ConsoleFramework.Rendering
       if (!affectedRect.IsEmpty)
       {
         // Affected rect relative to canvas
-        Rect affectedRectAbsolute = new Rect(affectedRect.x + RootElementRect.x, affectedRect.y + RootElementRect.y, affectedRect.width, affectedRect.height);
+        Rect affectedRectAbsolute = new Rect(affectedRect.X + RootElementRect.X, affectedRect.Y + RootElementRect.Y, affectedRect.width, affectedRect.height);
 
         // Clip according to real canvas size
         affectedRectAbsolute.Intersect(new Rect(new Point(0, 0), Canvas.Size));
@@ -279,8 +279,8 @@ namespace ConsoleFramework.Rendering
         }
 
         Rect parentAffectedRect = control.RenderSlotRect;
-        parentAffectedRect.Intersect(new Rect(affectedRect.x + control.ActualOffset.X,
-          affectedRect.y + control.ActualOffset.Y,
+        parentAffectedRect.Intersect(new Rect(affectedRect.X + control.ActualOffset.X,
+          affectedRect.Y + control.ActualOffset.Y,
           affectedRect.width,
           affectedRect.height));
         // нет смысла продолжать подъем вверх по дереву, если контрола точно уже не видно

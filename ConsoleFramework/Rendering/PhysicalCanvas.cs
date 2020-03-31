@@ -97,10 +97,10 @@ namespace ConsoleFramework.Rendering
       if (stdOutputHandle != IntPtr.Zero)
       {
         // we are in windows environment
-        SMALL_RECT rect = new SMALL_RECT((short) affectedRect.x, (short) affectedRect.y,
-          (short) (affectedRect.width + affectedRect.x), (short) (affectedRect.height + affectedRect.y));
+        SMALL_RECT rect = new SMALL_RECT((short) affectedRect.X, (short) affectedRect.Y,
+          (short) (affectedRect.width + affectedRect.X), (short) (affectedRect.height + affectedRect.Y));
         if (!Win32.WriteConsoleOutputCore(stdOutputHandle, _buffer, new COORD((short) _size.Width, (short) _size.Height),
-          new COORD((short) affectedRect.x, (short) affectedRect.y), ref rect))
+          new COORD((short) affectedRect.X, (short) affectedRect.Y), ref rect))
         {
           throw new InvalidOperationException(string.Format("Cannot write to console : {0}", Win32.GetLastErrorMessage()));
         }
@@ -110,10 +110,10 @@ namespace ConsoleFramework.Rendering
         // we are in linux
         for (int i = 0; i < affectedRect.width; i++)
         {
-          int x = i + affectedRect.x;
+          int x = i + affectedRect.X;
           for (int j = 0; j < affectedRect.height; j++)
           {
-            int y = j + affectedRect.y;
+            int y = j + affectedRect.Y;
             // todo : convert attributes and optimize rendering
             bool fgIntensity;
             short index = NCurses.winAttrsToNCursesAttrs(_buffer[y, x].Attributes,
