@@ -10,19 +10,19 @@ namespace ConsoleFramework.Events
   /// </summary>
   public class KeyGestureConverter : ITypeConverter
   {
-    internal const char DISPLAYSTRING_SEPARATOR = ',';
+    private const char DISPLAYSTRING_SEPARATOR = ',';
     private static readonly KeyConverter keyConverter = new KeyConverter();
     private static readonly ModifierKeysConverter modifierKeysConverter = new ModifierKeysConverter();
     private const char MODIFIERS_DELIMITER = '+';
 
     public bool CanConvertFrom(Type sourceType)
     {
-      return (sourceType == typeof(string));
+      return sourceType == typeof(string);
     }
 
     public bool CanConvertTo(Type destinationType)
     {
-      return (typeof(string) == destinationType);
+      return typeof(string) == destinationType;
     }
 
     public object ConvertFrom(object source)
