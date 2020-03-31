@@ -19,7 +19,7 @@ namespace ConsoleFramework.Controls
   /// </summary>
   public class ComboBox : Control
   {
-    private readonly bool shadow;
+    private readonly bool _shadow;
 
     public ComboBox() :
       this(true)
@@ -32,7 +32,7 @@ namespace ConsoleFramework.Controls
     /// <param name="shadow">Display shadow or not</param>
     public ComboBox(bool shadow)
     {
-      this.shadow = shadow;
+      this._shadow = shadow;
       Focusable = true;
       AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDown));
       AddHandler(KeyDownEvent, new KeyEventHandler(OnKeyDown));
@@ -40,31 +40,39 @@ namespace ConsoleFramework.Controls
 
     private bool Opened
     {
-      get { return m_opened; }
+      get { return _opened; }
       set
       {
-        m_opened = value;
+        _opened = value;
         Invalidate();
       }
     }
 
     public int? ShownItemsCount { get; set; }
 
-    private void openPopup()
+    private void OpenPopup()
     {
-      if (Opened) throw new InvalidOperationException("Assertion failed.");
-      Window popup = new PopupWindow(Items, SelectedItemIndex ?? 0, shadow,
-        ShownItemsCount != null ? ShownItemsCount.Value - 1 : (int?) null);
-      Point popupCoord = TranslatePoint(this, new Point(0, 0),
-        VisualTreeHelper.FindClosestParent<WindowsHost>(this));
+      if (Opened)
+      {
+        throw new InvalidOperationException("Assertion failed.");
+      }
+
+      Window popup = new PopupWindow(Items, SelectedItemIndex ?? 0, _shadow, ShownItemsCount != null ? ShownItemsCount.Value - 1 : (int?) null);
+      var popupCoord = TranslatePoint(this, new Point(0, 0), VisualTreeHelper.FindClosestParent<WindowsHost>(this));
       popup.X = popupCoord.X;
       popup.Y = popupCoord.Y;
-      popup.Width = shadow ? ActualWidth + 1 : ActualWidth;
+      popup.Width = _shadow ? ActualWidth + 1 : ActualWidth;
       if (Items.Count != 0)
+      {
         popup.Height = (ShownItemsCount != null ? ShownItemsCount.Value : Items.Count)
-                       + (shadow ? 2 : 1); // 1 row for transparent "header"
-      else popup.Height = shadow ? 3 : 2;
-      WindowsHost windowsHost = VisualTreeHelper.FindClosestParent<WindowsHost>(this);
+                       + (_shadow ? 2 : 1); // 1 row for transparent "header"
+      }
+      else
+      {
+        popup.Height = _shadow ? 3 : 2;
+      }
+
+      var windowsHost = VisualTreeHelper.FindClosestParent<WindowsHost>(this);
       windowsHost.ShowModal(popup, true);
       Opened = true;
       EventManager.AddHandler(popup, Window.ClosedEvent, new EventHandler(OnPopupClosed));
@@ -74,57 +82,67 @@ namespace ConsoleFramework.Controls
     {
       if (args.VirtualKeyCode == VirtualKeys.Return)
       {
-        openPopup();
+        OpenPopup();
       }
     }
 
     private void OnMouseDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
     {
       if (!Opened)
-        openPopup();
+      {
+        OpenPopup();
+      }
     }
 
     private void OnPopupClosed(object o, EventArgs args)
     {
-      if (!Opened) throw new InvalidOperationException("Assertion failed.");
+      if (!Opened)
+      {
+        throw new InvalidOperationException("Assertion failed.");
+      }
+
       Opened = false;
       this.SelectedItemIndex = ((PopupWindow) o).IndexSelected;
       EventManager.RemoveHandler(o, Window.ClosedEvent, new EventHandler(OnPopupClosed));
     }
 
-    private readonly List<String> items = new List<string>();
+    private readonly List<String> _items = new List<string>();
 
     public List<String> Items
     {
-      get { return items; }
+      get { return _items; }
     }
 
 
     public int? SelectedItemIndex
     {
-      get { return selectedItemIndex; }
+      get { return _selectedItemIndex; }
       set
       {
-        if (selectedItemIndex != value)
+        if (_selectedItemIndex != value)
         {
-          selectedItemIndex = value;
+          _selectedItemIndex = value;
           Invalidate();
           RaisePropertyChanged("SelectedItemIndex");
         }
       }
     }
 
-    private bool m_opened;
-    private int? selectedItemIndex;
+    private bool _opened;
+    private int? _selectedItemIndex;
 
     public static Size EMPTY_SIZE = new Size(3, 1);
 
     protected override Size MeasureOverride(Size availableSize)
     {
-      if (Items.Count == 0) return EMPTY_SIZE;
-      int maxLen = Items.Max(s => s.Length);
+      if (Items.Count == 0)
+      {
+        return EMPTY_SIZE;
+      }
+
+      var maxLen = Items.Max(s => s.Length);
       // 1 pixel from left, 1 from right, then arrow and 1 more empty pixel
-      Size size = new Size(Math.Min(maxLen + 4, availableSize.Width), 1);
+      var size = new Size(Math.Min(maxLen + 4, availableSize.Width), 1);
       return size;
     }
 
@@ -135,10 +153,13 @@ namespace ConsoleFramework.Controls
       {
         attrs = Colors.Blend(Color.White, Color.DarkGreen);
       }
-      else attrs = Colors.Blend(Color.Black, Color.DarkCyan);
+      else
+      {
+        attrs = Colors.Blend(Color.Black, Color.DarkCyan);
+      }
 
       buffer.SetPixel(0, 0, ' ', attrs);
-      int usedForCurrentItem = 0;
+      var usedForCurrentItem = 0;
       if (Items.Count != 0 && ActualWidth > 4)
       {
         usedForCurrentItem = RenderString(Items[SelectedItemIndex ?? 0], buffer, 1, 0, ActualWidth - 4, attrs);
