@@ -25,7 +25,7 @@ namespace ConsoleFramework.Events
       }
 
       var modifiersToken = ((string) source).Trim();
-      return this.GetModifierKeys(modifiersToken);
+      return GetModifierKeys(modifiersToken);
     }
 
     public object ConvertTo(object value, Type destinationType)
@@ -70,12 +70,12 @@ namespace ConsoleFramework.Events
       return (str + MatchModifiers(ModifierKeys.Shift));
     }
 
-    private ModifierKeys GetModifierKeys(string modifiersToken)
+    private static ModifierKeys GetModifierKeys(string modifiersToken)
     {
       var none = ModifierKeys.None;
       if (modifiersToken.Length != 0)
       {
-        var length = 0;
+        int length;
         do
         {
           length = modifiersToken.IndexOf(Modifier_Delimiter);
