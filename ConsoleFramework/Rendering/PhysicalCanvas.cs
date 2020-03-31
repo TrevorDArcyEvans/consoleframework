@@ -75,7 +75,7 @@ namespace ConsoleFramework.Rendering
           return cachedIndexers[index];
         }
 
-        NestedIndexer res = new NestedIndexer(index, this);
+        var res = new NestedIndexer(index, this);
         cachedIndexers[index] = res;
         return res;
       }
