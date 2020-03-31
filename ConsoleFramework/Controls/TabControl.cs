@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using ConsoleFramework.Core;
 using ConsoleFramework.Events;
-using ConsoleFramework.Native;
 using ConsoleFramework.Rendering;
 using Xaml;
 

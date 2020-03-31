@@ -50,7 +50,7 @@ namespace Tests
                     renderSize = new Size(10, 1)
                 }
             };
-            Rect layoutClip = control.applyMaxConstraints(new Rect(-10, -10, 20, 20));
+            Rect layoutClip = control.ApplyMaxConstraints(new Rect(-10, -10, 20, 20));
             // If Max constraint is present, the layoutClip will be clipped to
             // visualLayoutClip: a rect starting from (0, 0) and with size of (MaxWidth, MaxHeight)
             Assert.Equal(new Rect(0, 0, 3, 1), layoutClip);

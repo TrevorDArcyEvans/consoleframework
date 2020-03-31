@@ -33,11 +33,11 @@ namespace ConsoleFramework.Controls
 
     public object DataContext { get; set; }
 
-    private Dictionary<string, object> resources;
+    private Dictionary<string, object> _resources;
 
     public Dictionary<string, object> Resources
     {
-      get { return resources ?? (resources = new Dictionary<string, object>()); }
+      get { return _resources ?? (_resources = new Dictionary<string, object>()); }
     }
 
     public static RoutedEvent PreviewMouseMoveEvent = EventManager.RegisterRoutedEvent("PreviewMouseMove", RoutingStrategy.Tunnel, typeof(MouseEventHandler), typeof(Control));
@@ -167,16 +167,16 @@ namespace ConsoleFramework.Controls
     internal LayoutInfo LayoutInfo = new LayoutInfo();
     internal LayoutInfo LastLayoutInfo = new LayoutInfo();
 
-    private Visibility visibility;
+    private Visibility _visibility;
 
     public Visibility Visibility
     {
-      get { return visibility; }
+      get { return _visibility; }
       set
       {
-        if (visibility != value)
+        if (_visibility != value)
         {
-          visibility = value;
+          _visibility = value;
           Invalidate();
         }
       }
@@ -205,7 +205,7 @@ namespace ConsoleFramework.Controls
     /// <summary>
     /// Collection of children controls.
     /// </summary>
-    private readonly List<Control> children = new List<Control>();
+    private readonly List<Control> _children = new List<Control>();
 
     /// <summary>
     /// Parent of current control in visual tree.
@@ -220,21 +220,21 @@ namespace ConsoleFramework.Controls
     {
     }
 
-    private void attachedToRootElement()
+    private void AttachedToRootElement()
     {
-      this.attachedToVisualTree = true;
-      foreach (Control child in Children)
+      this._attachedToVisualTree = true;
+      foreach (var child in Children)
       {
-        child.attachedToRootElement();
+        child.AttachedToRootElement();
       }
     }
 
-    private void detachedFromRootElement()
+    private void DetachedFromRootElement()
     {
-      this.attachedToVisualTree = false;
-      foreach (Control child in Children)
+      this._attachedToVisualTree = false;
+      foreach (var child in Children)
       {
-        child.detachedFromRootElement();
+        child.DetachedFromRootElement();
       }
     }
 
@@ -244,30 +244,33 @@ namespace ConsoleFramework.Controls
     /// </summary>
     internal void ControlSetAsRootElement()
     {
-      attachedToRootElement();
+      AttachedToRootElement();
     }
 
     internal void ControlUnsetAsRootElement()
     {
-      detachedFromRootElement();
+      DetachedFromRootElement();
     }
 
     private void ParentChanged()
     {
       if (Parent == null)
       {
-        detachedFromRootElement();
+        DetachedFromRootElement();
       }
       else
       {
-        if (Parent.attachedToVisualTree) attachedToRootElement();
-        else detachedFromRootElement();
+        if (Parent._attachedToVisualTree)
+        {
+          AttachedToRootElement();
+        }
+        else DetachedFromRootElement();
       }
 
       OnParentChanged();
     }
 
-    private bool attachedToVisualTree;
+    private bool _attachedToVisualTree;
 
     internal void InsertChildAt(int index, Control child)
     {
@@ -281,7 +284,7 @@ namespace ConsoleFramework.Controls
         throw new ArgumentException("Specified child already has parent.");
       }
 
-      children.Insert(index, child);
+      _children.Insert(index, child);
       child.Parent = this;
       child.ParentChanged();
       child.Invalidate();
@@ -300,7 +303,7 @@ namespace ConsoleFramework.Controls
         throw new ArgumentException("Specified child already has parent.");
       }
 
-      children.Add(child);
+      _children.Add(child);
       child.Parent = this;
       child.ParentChanged();
       child.Invalidate();
@@ -320,7 +323,7 @@ namespace ConsoleFramework.Controls
       }
 
       ConsoleApplication.Instance.FocusManager.BeforeRemoveElementFromTree(child);
-      if (!this.children.Remove(child))
+      if (!this._children.Remove(child))
       {
         throw new InvalidOperationException("Assertion failed.");
       }
@@ -342,12 +345,12 @@ namespace ConsoleFramework.Controls
     /// <param name="b">Index of second child</param>
     protected void SwapChildsZOrder(int a, int b)
     {
-      if (a < 0 || a >= children.Count)
+      if (a < 0 || a >= _children.Count)
       {
         throw new ArgumentException("Incorrect index", "a");
       }
 
-      if (b < 0 || b >= children.Count)
+      if (b < 0 || b >= _children.Count)
       {
         throw new ArgumentException("Incorrect index", "b");
       }
@@ -357,9 +360,9 @@ namespace ConsoleFramework.Controls
         return;
       }
 
-      var tmp = this.children[a];
-      this.children[a] = this.children[b];
-      this.children[b] = tmp;
+      var tmp = this._children[a];
+      this._children[a] = this._children[b];
+      this._children[b] = tmp;
 
       // Add this to zorderCheckControls list
       ConsoleApplication.Instance.Renderer.AddControlToZOrderCheckList(this);
@@ -392,7 +395,7 @@ namespace ConsoleFramework.Controls
 
     public Control()
     {
-      Children = children.AsReadOnly();
+      Children = _children.AsReadOnly();
       MinWidth = 0;
       Focusable = false;
       IsFocusScope = false;
@@ -643,8 +646,7 @@ namespace ConsoleFramework.Controls
       var desiredSize = MeasureOverride(frameworkAvailableSize);
       if (desiredSize.Width == int.MaxValue || desiredSize.Height == int.MaxValue)
       {
-        throw new InvalidOperationException("MeasureOverride should not return int.MaxValue even for" +
-                                            "availableSize = {int.MaxValue, int.MaxValue} argument.");
+        throw new InvalidOperationException("MeasureOverride should not return int.MaxValue even for availableSize = {int.MaxValue, int.MaxValue} argument.");
       }
 
       //  maximize desiredSize with user provided min size
@@ -767,7 +769,7 @@ namespace ConsoleFramework.Controls
       {
         RenderSlotRect = Rect.Empty;
         RenderSize = Size.Empty;
-        LayoutInfo.layoutClip = calculateLayoutClip();
+        LayoutInfo.layoutClip = CalculateLayoutClip();
         LayoutInfo.validity = LayoutValidity.MeasureAndArrange;
         return;
       }
@@ -840,7 +842,7 @@ namespace ConsoleFramework.Controls
         this.ActualOffset = offset;
       }
 
-      LayoutInfo.layoutClip = calculateLayoutClip();
+      LayoutInfo.layoutClip = CalculateLayoutClip();
 
       LayoutInfo.validity = LayoutValidity.MeasureAndArrange;
     }
@@ -870,15 +872,15 @@ namespace ConsoleFramework.Controls
       private set => LayoutInfo.renderSlotRect = value;
     }
 
-    private Rect calculateLayoutClip()
+    private Rect CalculateLayoutClip()
     {
       var offset = ComputeAlignmentOffset();
       var clientSize = GetClientSize();
       var layoutClip = new Rect(-offset.X, -offset.Y, clientSize.Width, clientSize.Height);
-      return applyMaxConstraints(layoutClip);
+      return ApplyMaxConstraints(layoutClip);
     }
 
-    internal Rect applyMaxConstraints(Rect layoutClip)
+    internal Rect ApplyMaxConstraints(Rect layoutClip)
     {
       // Если указаны MaxWidth/Height ограничения, то из видимой части layoutClip
       // оставляем в углу TopLeft только то, что влезает в Max. TopLeft выбран потому,
@@ -901,19 +903,18 @@ namespace ConsoleFramework.Controls
 
     private Vector ComputeAlignmentOffset()
     {
-      //
-      MinMax mm = new MinMax(MinHeight, MaxHeight, MinWidth, MaxWidth, Width, Height);
+      var mm = new MinMax(MinHeight, MaxHeight, MinWidth, MaxWidth, Width, Height);
 
-      Size renderSize = RenderSize;
+      var renderSize = RenderSize;
 
       //clippedInkSize differs from InkSize only what MaxWidth/Height explicitly clip the
       //otherwise good arrangement. For ex, DS<clientSize but DS>MaxWidth - in this
       //case we should initiate clip at MaxWidth and only show Top-Left portion 
       //of the element limited by Max properties. It is Top-left because in case when we
       //are clipped by container we also degrade to Top-Left, so we are consistent. 
-      Size clippedInkSize = new Size(Math.Min(renderSize.Width, mm.maxWidth),
+      var clippedInkSize = new Size(Math.Min(renderSize.Width, mm.maxWidth),
         Math.Min(renderSize.Height, mm.maxHeight));
-      Size clientSize = GetClientSize();
+      var clientSize = GetClientSize();
 
       return ComputeAlignmentOffsetCore(clientSize, clippedInkSize);
     }
@@ -1062,7 +1063,7 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public void Invalidate()
     {
-      if (this.attachedToVisualTree)
+      if (this._attachedToVisualTree)
       {
         ConsoleApplication.Instance.Renderer.AddControlToInvalidationQueue(this);
         if (Invalidated != null)
@@ -1116,10 +1117,13 @@ namespace ConsoleFramework.Controls
           var currentControl = source;
           for (;;)
           {
-            Vector actualOffset = currentControl.ActualOffset;
+            var actualOffset = currentControl.ActualOffset;
             point.Offset(actualOffset.X, actualOffset.Y);
             if (currentControl.Parent == null)
+            {
               break;
+            }
+
             currentControl = currentControl.Parent;
           }
 
@@ -1365,16 +1369,16 @@ namespace ConsoleFramework.Controls
       ConsoleApplication.Instance.ShowCursor();
     }
 
-    private bool cursorVisible = false;
+    private bool _cursorVisible = false;
 
     internal bool CursorVisible
     {
-      get { return cursorVisible; }
+      get { return _cursorVisible; }
       set
       {
-        if (cursorVisible != value)
+        if (_cursorVisible != value)
         {
-          cursorVisible = value;
+          _cursorVisible = value;
           if (HasFocus)
           {
             ConsoleApplication.Instance.FocusManager.RefreshMouseCursor();
@@ -1383,16 +1387,16 @@ namespace ConsoleFramework.Controls
       }
     }
 
-    private Point cursorPosition = new Point(0, 0);
+    private Point _cursorPosition = new Point(0, 0);
 
     internal Point CursorPosition
     {
-      get => cursorPosition;
+      get => _cursorPosition;
       set
       {
-        if (cursorPosition != value)
+        if (_cursorPosition != value)
         {
-          cursorPosition = value;
+          _cursorPosition = value;
           if (HasFocus)
           {
             ConsoleApplication.Instance.FocusManager.RefreshMouseCursor();
