@@ -37,7 +37,7 @@ namespace Xaml
         throw new ArgumentNullException("xaml");
       }
 
-      XamlParser parser = new XamlParser(defaultNamespaces);
+      var parser = new XamlParser(defaultNamespaces);
       return (T) parser.CreateFromXaml(xaml, dataContext);
     }
 
@@ -78,9 +78,9 @@ namespace Xaml
       }
       else
       {
-        MarkupExtensionsParser markupExtensionsParser = new MarkupExtensionsParser(new MarkupExtensionsResolver(this), text);
-        MarkupExtensionContext context = new MarkupExtensionContext(this, text, currentProperty, currentObject, FindClosestDataContext() ?? rootDataContext);
-        object providedValue = markupExtensionsParser.ProcessMarkupExtension(context);
+        var markupExtensionsParser = new MarkupExtensionsParser(new MarkupExtensionsResolver(this), text);
+        var context = new MarkupExtensionContext(this, text, currentProperty, currentObject, FindClosestDataContext() ?? rootDataContext);
+        var providedValue = markupExtensionsParser.ProcessMarkupExtension(context);
         if (providedValue is IFixupToken)
         {
           _fixupTokens.Add((FixupToken) providedValue);
@@ -100,14 +100,14 @@ namespace Xaml
     {
       foreach (var objectInfo in _objects)
       {
-        Type type = objectInfo.obj.GetType();
-        PropertyInfo dataContextProp = type.GetProperty(GetDataContextPropertyName(type));
+        var type = objectInfo.obj.GetType();
+        var dataContextProp = type.GetProperty(GetDataContextPropertyName(type));
         if (dataContextProp == null)
         {
           continue;
         }
 
-        object dataContextValue = dataContextProp.GetValue(objectInfo.obj);
+        var dataContextValue = dataContextProp.GetValue(objectInfo.obj);
         if (dataContextValue != null)
         {
           return dataContextValue;
@@ -181,20 +181,20 @@ namespace Xaml
     {
       this._dataContext = dataContext;
 
-      using (XmlReader xmlReader = XmlReader.Create(new StringReader(xaml)))
+      using (var xmlReader = XmlReader.Create(new StringReader(xaml)))
       {
         while (xmlReader.Read())
         {
           if (xmlReader.NodeType == XmlNodeType.Element)
           {
-            string name = xmlReader.Name;
+            var name = xmlReader.Name;
 
             // explicit property syntax
             if (Top != null && name.Contains("."))
             {
               // type may be qualified with xmlns namespace
-              string typePrefix = name.Substring(0, name.IndexOf('.'));
-              Type type = ResolveType(typePrefix);
+              var typePrefix = name.Substring(0, name.IndexOf('.'));
+              var type = ResolveType(typePrefix);
               if (type != Top.type)
               {
                 throw new Exception($"Property {name} doesn't match current object {Top.type}");
@@ -205,12 +205,12 @@ namespace Xaml
                 throw new Exception("Illegal syntax in property value definition");
               }
 
-              string propertyName = name.Substring(name.IndexOf('.') + 1);
+              var propertyName = name.Substring(name.IndexOf('.') + 1);
               Top.currentProperty = propertyName;
             }
             else
             {
-              bool processingRootObject = (_objects.Count == 0);
+              var processingRootObject = (_objects.Count == 0);
 
               // Process namespace attributes if processing root object
               if (processingRootObject && xmlReader.HasAttributes)
@@ -219,9 +219,9 @@ namespace Xaml
                 {
                   while (xmlReader.MoveToNextAttribute())
                   {
-                    string attributePrefix = xmlReader.Prefix;
-                    string attributeName = xmlReader.LocalName;
-                    string attributeValue = xmlReader.Value;
+                    var attributePrefix = xmlReader.Prefix;
+                    var attributeName = xmlReader.LocalName;
+                    var attributeValue = xmlReader.Value;
 
                     // If we have found xmlns-attributes on root object, register them
                     // in namespaces dictionary
@@ -244,13 +244,15 @@ namespace Xaml
               {
                 while (xmlReader.MoveToNextAttribute())
                 {
-                  string attributePrefix = xmlReader.Prefix;
-                  string attributeName = xmlReader.LocalName;
-                  string attributeValue = xmlReader.Value;
+                  var attributePrefix = xmlReader.Prefix;
+                  var attributeName = xmlReader.LocalName;
+                  var attributeValue = xmlReader.Value;
 
                   // Skip xmls attributes of root object
                   if (attributePrefix == "xmlns" && processingRootObject)
+                  {
                     continue;
+                  }
 
                   ProcessAttribute(attributePrefix, attributeName, attributeValue);
                 }
@@ -258,7 +260,10 @@ namespace Xaml
                 xmlReader.MoveToElement();
               }
 
-              if (xmlReader.IsEmptyElement) ProcessEndElement();
+              if (xmlReader.IsEmptyElement)
+              {
+                ProcessEndElement();
+              }
             }
           }
 
@@ -299,15 +304,15 @@ namespace Xaml
 
     private ObjectInfo CreateObject(string name)
     {
-      Type type = _aliases.ContainsKey(name) ? _aliases[name] : ResolveType(name);
+      var type = _aliases.ContainsKey(name) ? _aliases[name] : ResolveType(name);
 
-      ConstructorInfo constructorInfo = type.GetConstructor(new Type[0]);
+      var constructorInfo = type.GetConstructor(new Type[0]);
       if (null == constructorInfo)
       {
         throw new Exception(String.Format("Type {0} has no default constructor.", type.FullName));
       }
 
-      Object invoke = constructorInfo.Invoke(new object[0]);
+      var invoke = constructorInfo.Invoke(new object[0]);
       return new ObjectInfo()
       {
         obj = invoke,
@@ -324,7 +329,7 @@ namespace Xaml
           throw new InvalidOperationException(string.Format("Unknown prefix {0}", attributePrefix));
         }
 
-        string namespaceUrl = _namespaces[attributePrefix];
+        var namespaceUrl = _namespaces[attributePrefix];
         if (namespaceUrl == "http://consoleframework.org/xaml.xsd")
         {
           if (attributeName == "Key")
@@ -340,16 +345,16 @@ namespace Xaml
       else
       {
         // Process attribute as property assignment
-        PropertyInfo propertyInfo = Top.type.GetProperty(attributeName);
+        var propertyInfo = Top.type.GetProperty(attributeName);
         if (null == propertyInfo)
         {
           throw new InvalidOperationException(string.Format("Property {0} not found.", attributeName));
         }
 
-        Object value = ProcessText(attributeValue, attributeName, Top.obj, _dataContext);
+        var value = ProcessText(attributeValue, attributeName, Top.obj, _dataContext);
         if (null != value)
         {
-          object convertedValue = ConvertValueIfNeed(value.GetType(), propertyInfo.PropertyType, value);
+          var convertedValue = ConvertValueIfNeed(value.GetType(), propertyInfo.PropertyType, value);
           propertyInfo.SetValue(Top.obj, convertedValue, null);
         }
       }
@@ -357,7 +362,7 @@ namespace Xaml
 
     private static string GetContentPropertyName(Type type)
     {
-      object[] attributes = type.GetTypeInfo().GetCustomAttributes(typeof(ContentPropertyAttribute), true).ToArray();
+      var attributes = type.GetTypeInfo().GetCustomAttributes(typeof(ContentPropertyAttribute), true).ToArray();
       if (attributes.Length == 0)
       {
         return "Content";
@@ -381,13 +386,13 @@ namespace Xaml
       // closed element having text content
       if (Top.currentPropertyText != null)
       {
-        PropertyInfo property = Top.currentProperty != null
+        var property = Top.currentProperty != null
           ? Top.type.GetProperty(Top.currentProperty)
           : Top.type.GetProperty(GetContentPropertyName(Top.type));
-        Object value = ProcessText(Top.currentPropertyText, Top.currentProperty, Top.obj, _dataContext);
+        var value = ProcessText(Top.currentPropertyText, Top.currentProperty, Top.obj, _dataContext);
         if (value != null)
         {
-          Object convertedValue = ConvertValueIfNeed(value.GetType(), property.PropertyType, value);
+          var convertedValue = ConvertValueIfNeed(value.GetType(), property.PropertyType, value);
           property.SetValue(Top.obj, convertedValue, null);
         }
 
@@ -414,7 +419,10 @@ namespace Xaml
         assignToParent = true;
       }
 
-      if (!assignToParent) return;
+      if (!assignToParent)
+      {
+        return;
+      }
 
       // closed element having sub-element content
       if (Top.currentProperty != null)
@@ -429,7 +437,7 @@ namespace Xaml
         // был закрыт основной тег текущего конструируемого объекта
         // нужно получить объект уровнем выше и присвоить себя свойству этого
         // объекта, либо добавить в свойство-коллекцию, если это коллекция
-        ObjectInfo initialized = _objects.Pop();
+        var initialized = _objects.Pop();
 
         if (initialized.obj is IFactory)
         {
@@ -442,20 +450,20 @@ namespace Xaml
         }
         else
         {
-          string propertyName = Top.currentProperty ?? GetContentPropertyName(Top.type);
+          var propertyName = Top.currentProperty ?? GetContentPropertyName(Top.type);
 
           // If parent object property is ICollection<T>,
           // add current object into them as T (will conversion if need)
-          PropertyInfo property = Top.type.GetProperty(propertyName);
-          Type typeArg1 = property.PropertyType.GetTypeInfo().IsGenericType
+          var property = Top.type.GetProperty(propertyName);
+          var typeArg1 = property.PropertyType.GetTypeInfo().IsGenericType
             ? property.PropertyType.GetGenericArguments()[0]
             : null;
           if (null != typeArg1 &&
               typeof(ICollection<>).MakeGenericType(typeArg1).IsAssignableFrom(property.PropertyType))
           {
-            object collection = property.GetValue(Top.obj, null);
-            MethodInfo methodInfo = collection.GetType().GetMethod("Add");
-            object converted = ConvertValueIfNeed(initialized.obj.GetType(), typeArg1, initialized.obj);
+            var collection = property.GetValue(Top.obj, null);
+            var methodInfo = collection.GetType().GetMethod("Add");
+            var converted = ConvertValueIfNeed(initialized.obj.GetType(), typeArg1, initialized.obj);
             methodInfo.Invoke(collection, new[] { converted });
           }
           else
@@ -463,7 +471,7 @@ namespace Xaml
             // If parent object property is IList add current object into them without conversion
             if (typeof(IList).IsAssignableFrom(property.PropertyType))
             {
-              IList list = (IList) property.GetValue(Top.obj, null);
+              var list = (IList) property.GetValue(Top.obj, null);
               list.Add(initialized.obj);
             }
             else
@@ -471,8 +479,8 @@ namespace Xaml
               // If parent object property is IDictionary<string, T>,
               // add current object into them (by x:Key value) 
               // with conversion to T if need
-              Type typeArg2 = property.PropertyType.GetTypeInfo().IsGenericType &&
-                              property.PropertyType.GetGenericArguments().Length > 1
+              var typeArg2 = property.PropertyType.GetTypeInfo().IsGenericType &&
+                             property.PropertyType.GetGenericArguments().Length > 1
                 ? property.PropertyType.GetGenericArguments()[1]
                 : null;
               if (null != typeArg1 &&
@@ -481,9 +489,9 @@ namespace Xaml
                   typeof(IDictionary<,>).MakeGenericType(typeArg1, typeArg2)
                     .IsAssignableFrom(property.PropertyType))
               {
-                object dictionary = property.GetValue(Top.obj, null);
-                MethodInfo methodInfo = dictionary.GetType().GetMethod("Add");
-                object converted = ConvertValueIfNeed(initialized.obj.GetType(), typeArg2, initialized.obj);
+                var dictionary = property.GetValue(Top.obj, null);
+                var methodInfo = dictionary.GetType().GetMethod("Add");
+                var converted = ConvertValueIfNeed(initialized.obj.GetType(), typeArg2, initialized.obj);
                 if (null == initialized.key)
                 {
                   throw new InvalidOperationException("Key is not specified for item of dictionary");
@@ -521,15 +529,15 @@ namespace Xaml
     {
       // Выполнить поиск fixup tokens, желания которых удовлетворены,
       // и вызвать расширения разметки для них снова
-      List<FixupToken> tokens = new List<FixupToken>(_fixupTokens);
+      var tokens = new List<FixupToken>(_fixupTokens);
       _fixupTokens.Clear();
-      foreach (FixupToken token in tokens)
+      foreach (var token in tokens)
       {
         if (token.Ids.All(id => _objectsById.ContainsKey(id)))
         {
-          MarkupExtensionsParser markupExtensionsParser = new MarkupExtensionsParser(new MarkupExtensionsResolver(this), token.Expression);
-          MarkupExtensionContext context = new MarkupExtensionContext(this, token.Expression, token.PropertyName, token.Object, token.DataContext);
-          object providedValue = markupExtensionsParser.ProcessMarkupExtension(context);
+          var markupExtensionsParser = new MarkupExtensionsParser(new MarkupExtensionsResolver(this), token.Expression);
+          var context = new MarkupExtensionContext(this, token.Expression, token.PropertyName, token.Object, token.DataContext);
+          var providedValue = markupExtensionsParser.ProcessMarkupExtension(context);
           if (providedValue is IFixupToken)
           {
             _fixupTokens.Add((FixupToken) providedValue);
@@ -539,8 +547,8 @@ namespace Xaml
             // assign providedValue to property of object
             if (null != providedValue)
             {
-              PropertyInfo propertyInfo = token.Object.GetType().GetProperty(token.PropertyName);
-              object convertedValue = ConvertValueIfNeed(providedValue.GetType(), propertyInfo.PropertyType, providedValue);
+              var propertyInfo = token.Object.GetType().GetProperty(token.PropertyName);
+              var convertedValue = ConvertValueIfNeed(providedValue.GetType(), propertyInfo.PropertyType, providedValue);
               propertyInfo.SetValue(token.Object, convertedValue, null);
             }
           }
@@ -568,9 +576,9 @@ namespace Xaml
 
       // Process enumerations
       // todo : add TypeConverterAttribute support on enum, and unit tests
-      if (source == typeof(String) && dest.GetTypeInfo().IsEnum)
+      if (source == typeof(string) && dest.GetTypeInfo().IsEnum)
       {
-        string[] enumNames = Enum.GetNames(dest);
+        var enumNames = Enum.GetNames(dest);
         for (int i = 0, len = enumNames.Length; i < len; i++)
         {
           if (enumNames[i] == (String) value)
@@ -601,7 +609,7 @@ namespace Xaml
       // Process TypeConverterAttribute attributes if exist
       if (Type.GetTypeCode(source) == TypeCode.Object)
       {
-        object[] attributes = source.GetTypeInfo().GetCustomAttributes(typeof(TypeConverterAttribute), true).ToArray();
+        var attributes = source.GetTypeInfo().GetCustomAttributes(typeof(TypeConverterAttribute), true).ToArray();
         if (attributes.Length > 1)
         {
           throw new InvalidOperationException("Ambiguous attribute: more than one TypeConverterAttribute");
@@ -609,15 +617,15 @@ namespace Xaml
 
         if (attributes.Length == 1)
         {
-          TypeConverterAttribute attribute = (TypeConverterAttribute) attributes[0];
-          Type typeConverterType = attribute.Type;
-          ConstructorInfo ctor = typeConverterType.GetConstructor(new Type[0]);
+          var attribute = (TypeConverterAttribute) attributes[0];
+          var typeConverterType = attribute.Type;
+          var ctor = typeConverterType.GetConstructor(new Type[0]);
           if (null == ctor)
           {
             throw new InvalidOperationException($"No default constructor in {typeConverterType.Name} type");
           }
 
-          ITypeConverter converter = (ITypeConverter) ctor.Invoke(new object[0]);
+          var converter = (ITypeConverter) ctor.Invoke(new object[0]);
           if (converter.CanConvertTo(dest))
           {
             return converter.ConvertTo(value, dest);
@@ -627,7 +635,7 @@ namespace Xaml
 
       if (Type.GetTypeCode(dest) == TypeCode.Object)
       {
-        object[] attributes = dest.GetTypeInfo().GetCustomAttributes(typeof(TypeConverterAttribute), true).ToArray();
+        var attributes = dest.GetTypeInfo().GetCustomAttributes(typeof(TypeConverterAttribute), true).ToArray();
         if (attributes.Length > 1)
         {
           throw new InvalidOperationException("Ambiguous attribute: more than one TypeConverterAttribute");
@@ -635,15 +643,15 @@ namespace Xaml
 
         if (attributes.Length == 1)
         {
-          TypeConverterAttribute attribute = (TypeConverterAttribute) attributes[0];
-          Type typeConverterType = attribute.Type;
-          ConstructorInfo ctor = typeConverterType.GetConstructor(new Type[0]);
+          var attribute = (TypeConverterAttribute) attributes[0];
+          var typeConverterType = attribute.Type;
+          var ctor = typeConverterType.GetConstructor(new Type[0]);
           if (null == ctor)
           {
             throw new InvalidOperationException(string.Format("No default constructor in {0} type", typeConverterType.Name));
           }
 
-          ITypeConverter converter = (ITypeConverter) ctor.Invoke(new object[0]);
+          var converter = (ITypeConverter) ctor.Invoke(new object[0]);
           if (converter.CanConvertFrom(source))
           {
             return converter.ConvertFrom(value);
@@ -656,32 +664,31 @@ namespace Xaml
 
     private Type ResolveMarkupExtensionType(string name)
     {
-      string bindingName;
-      var namespacesToScan = GetNamespacesToScan(name, out bindingName);
+      var namespacesToScan = GetNamespacesToScan(name, out var bindingName);
 
       // Scan namespaces todo : cache types lists
       Type resultType = null;
-      foreach (string ns in namespacesToScan)
+      foreach (var ns in namespacesToScan)
       {
-        Regex regex = new Regex("clr-namespace:(.+);assembly=(.+)");
-        MatchCollection matchCollection = regex.Matches(ns);
+        var regex = new Regex("clr-namespace:(.+);assembly=(.+)");
+        var matchCollection = regex.Matches(ns);
         if (matchCollection.Count == 0)
         {
           throw new InvalidOperationException(string.Format("Invalid clr-namespace syntax: {0}", ns));
         }
 
-        string namespaceName = matchCollection[0].Groups[1].Value;
-        string assemblyName = matchCollection[0].Groups[2].Value;
+        var namespaceName = matchCollection[0].Groups[1].Value;
+        var assemblyName = matchCollection[0].Groups[2].Value;
 
-        Assembly assembly = Assembly.Load(new AssemblyName(assemblyName));
-        List<Type> types = assembly.GetTypes().Where(type =>
+        var assembly = Assembly.Load(new AssemblyName(assemblyName));
+        var types = assembly.GetTypes().Where(type =>
         {
           if (type.Namespace != namespaceName)
           {
             return false;
           }
 
-          object[] attributes = type.GetTypeInfo().GetCustomAttributes(typeof(MarkupExtensionAttribute), true).ToArray();
+          var attributes = type.GetTypeInfo().GetCustomAttributes(typeof(MarkupExtensionAttribute), true).ToArray();
           return (attributes.Any(o => ((MarkupExtensionAttribute) o).Name == bindingName));
         }).ToList();
 
@@ -714,25 +721,24 @@ namespace Xaml
     /// </summary>
     private Type ResolveType(string name)
     {
-      string typeName;
-      var namespacesToScan = GetNamespacesToScan(name, out typeName);
+      var namespacesToScan = GetNamespacesToScan(name, out var typeName);
 
       // Scan namespaces todo : cache types lists
       Type resultType = null;
-      foreach (string ns in namespacesToScan)
+      foreach (var ns in namespacesToScan)
       {
-        Regex regex = new Regex("clr-namespace:(.+);assembly=(.+)");
-        MatchCollection matchCollection = regex.Matches(ns);
+        var regex = new Regex("clr-namespace:(.+);assembly=(.+)");
+        var matchCollection = regex.Matches(ns);
         if (matchCollection.Count == 0)
         {
           throw new InvalidOperationException(string.Format("Invalid clr-namespace syntax: {0}", ns));
         }
 
-        string namespaceName = matchCollection[0].Groups[1].Value;
-        string assemblyName = matchCollection[0].Groups[2].Value;
+        var namespaceName = matchCollection[0].Groups[1].Value;
+        var assemblyName = matchCollection[0].Groups[2].Value;
 
-        Assembly assembly = Assembly.Load(new AssemblyName(assemblyName));
-        List<Type> types = assembly
+        var assembly = Assembly.Load(new AssemblyName(assemblyName));
+        var types = assembly
           .GetTypes()
           .Where(type => type.Namespace == namespaceName && type.Name == typeName)
           .ToList();
@@ -765,7 +771,7 @@ namespace Xaml
       List<string> namespacesToScan;
       if (name.Contains(":"))
       {
-        string prefix = name.Substring(0, name.IndexOf(':'));
+        var prefix = name.Substring(0, name.IndexOf(':'));
         if (name.IndexOf(':') + 1 >= name.Length)
         {
           throw new InvalidOperationException(string.Format("Invalid type name {0}", name));
