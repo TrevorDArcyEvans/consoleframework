@@ -100,14 +100,14 @@ namespace Xaml
     {
       foreach (var objectInfo in _objects)
       {
-        var type = objectInfo.obj.GetType();
+        var type = objectInfo.Obj.GetType();
         var dataContextProp = type.GetProperty(GetDataContextPropertyName(type));
         if (dataContextProp == null)
         {
           continue;
         }
 
-        var dataContextValue = dataContextProp.GetValue(objectInfo.obj);
+        var dataContextValue = dataContextProp.GetValue(objectInfo.Obj);
         if (dataContextValue != null)
         {
           return dataContextValue;
@@ -195,18 +195,18 @@ namespace Xaml
               // type may be qualified with xmlns namespace
               var typePrefix = name.Substring(0, name.IndexOf('.'));
               var type = ResolveType(typePrefix);
-              if (type != Top.type)
+              if (type != Top.Type)
               {
-                throw new Exception($"Property {name} doesn't match current object {Top.type}");
+                throw new Exception($"Property {name} doesn't match current object {Top.Type}");
               }
 
-              if (Top.currentProperty != null)
+              if (Top.CurrentProperty != null)
               {
                 throw new Exception("Illegal syntax in property value definition");
               }
 
               var propertyName = name.Substring(name.IndexOf('.') + 1);
-              Top.currentProperty = propertyName;
+              Top.CurrentProperty = propertyName;
             }
             else
             {
@@ -270,7 +270,7 @@ namespace Xaml
           if (xmlReader.NodeType == XmlNodeType.Text)
           {
             // this call moves xmlReader current element forward
-            Top.currentPropertyText = xmlReader.ReadContentAsString();
+            Top.CurrentPropertyText = xmlReader.ReadContentAsString();
           }
 
           if (xmlReader.NodeType == XmlNodeType.EndElement)
@@ -315,8 +315,8 @@ namespace Xaml
       var invoke = constructorInfo.Invoke(new object[0]);
       return new ObjectInfo()
       {
-        obj = invoke,
-        type = type
+        Obj = invoke,
+        Type = type
       };
     }
 
@@ -334,28 +334,28 @@ namespace Xaml
         {
           if (attributeName == "Key")
           {
-            Top.key = attributeValue;
+            Top.Key = attributeValue;
           }
           else if (attributeName == "Id")
           {
-            Top.id = attributeValue;
+            Top.Id = attributeValue;
           }
         }
       }
       else
       {
         // Process attribute as property assignment
-        var propertyInfo = Top.type.GetProperty(attributeName);
+        var propertyInfo = Top.Type.GetProperty(attributeName);
         if (null == propertyInfo)
         {
           throw new InvalidOperationException(string.Format("Property {0} not found.", attributeName));
         }
 
-        var value = ProcessText(attributeValue, attributeName, Top.obj, _dataContext);
+        var value = ProcessText(attributeValue, attributeName, Top.Obj, _dataContext);
         if (null != value)
         {
           var convertedValue = ConvertValueIfNeed(value.GetType(), propertyInfo.PropertyType, value);
-          propertyInfo.SetValue(Top.obj, convertedValue, null);
+          propertyInfo.SetValue(Top.Obj, convertedValue, null);
         }
       }
     }
@@ -384,21 +384,21 @@ namespace Xaml
       bool assignToParent;
 
       // closed element having text content
-      if (Top.currentPropertyText != null)
+      if (Top.CurrentPropertyText != null)
       {
-        var property = Top.currentProperty != null
-          ? Top.type.GetProperty(Top.currentProperty)
-          : Top.type.GetProperty(GetContentPropertyName(Top.type));
-        var value = ProcessText(Top.currentPropertyText, Top.currentProperty, Top.obj, _dataContext);
+        var property = Top.CurrentProperty != null
+          ? Top.Type.GetProperty(Top.CurrentProperty)
+          : Top.Type.GetProperty(GetContentPropertyName(Top.Type));
+        var value = ProcessText(Top.CurrentPropertyText, Top.CurrentProperty, Top.Obj, _dataContext);
         if (value != null)
         {
           var convertedValue = ConvertValueIfNeed(value.GetType(), property.PropertyType, value);
-          property.SetValue(Top.obj, convertedValue, null);
+          property.SetValue(Top.Obj, convertedValue, null);
         }
 
-        if (Top.currentProperty != null)
+        if (Top.CurrentProperty != null)
         {
-          Top.currentProperty = null;
+          Top.CurrentProperty = null;
           assignToParent = false;
         }
         else
@@ -412,7 +412,7 @@ namespace Xaml
           assignToParent = true;
         }
 
-        Top.currentPropertyText = null;
+        Top.CurrentPropertyText = null;
       }
       else
       {
@@ -425,12 +425,12 @@ namespace Xaml
       }
 
       // closed element having sub-element content
-      if (Top.currentProperty != null)
+      if (Top.CurrentProperty != null)
       {
         // был закрыт один из тегов-свойств, дочерний элемент
         // уже присвоен свойству, поэтому ничего делать не нужно, кроме
         // обнуления currentProperty
-        Top.currentProperty = null;
+        Top.CurrentProperty = null;
       }
       else
       {
@@ -439,31 +439,31 @@ namespace Xaml
         // объекта, либо добавить в свойство-коллекцию, если это коллекция
         var initialized = _objects.Pop();
 
-        if (initialized.obj is IFactory)
+        if (initialized.Obj is IFactory)
         {
-          initialized.obj = ((IFactory) initialized.obj).GetObject();
+          initialized.Obj = ((IFactory) initialized.Obj).GetObject();
         }
 
         if (_objects.Count == 0)
         {
-          _result = initialized.obj;
+          _result = initialized.Obj;
         }
         else
         {
-          var propertyName = Top.currentProperty ?? GetContentPropertyName(Top.type);
+          var propertyName = Top.CurrentProperty ?? GetContentPropertyName(Top.Type);
 
           // If parent object property is ICollection<T>,
           // add current object into them as T (will conversion if need)
-          var property = Top.type.GetProperty(propertyName);
+          var property = Top.Type.GetProperty(propertyName);
           var typeArg1 = property.PropertyType.GetTypeInfo().IsGenericType
             ? property.PropertyType.GetGenericArguments()[0]
             : null;
           if (null != typeArg1 &&
               typeof(ICollection<>).MakeGenericType(typeArg1).IsAssignableFrom(property.PropertyType))
           {
-            var collection = property.GetValue(Top.obj, null);
+            var collection = property.GetValue(Top.Obj, null);
             var methodInfo = collection.GetType().GetMethod("Add");
-            var converted = ConvertValueIfNeed(initialized.obj.GetType(), typeArg1, initialized.obj);
+            var converted = ConvertValueIfNeed(initialized.Obj.GetType(), typeArg1, initialized.Obj);
             methodInfo.Invoke(collection, new[] { converted });
           }
           else
@@ -471,8 +471,8 @@ namespace Xaml
             // If parent object property is IList add current object into them without conversion
             if (typeof(IList).IsAssignableFrom(property.PropertyType))
             {
-              var list = (IList) property.GetValue(Top.obj, null);
-              list.Add(initialized.obj);
+              var list = (IList) property.GetValue(Top.Obj, null);
+              list.Add(initialized.Obj);
             }
             else
             {
@@ -489,21 +489,21 @@ namespace Xaml
                   typeof(IDictionary<,>).MakeGenericType(typeArg1, typeArg2)
                     .IsAssignableFrom(property.PropertyType))
               {
-                var dictionary = property.GetValue(Top.obj, null);
+                var dictionary = property.GetValue(Top.Obj, null);
                 var methodInfo = dictionary.GetType().GetMethod("Add");
-                var converted = ConvertValueIfNeed(initialized.obj.GetType(), typeArg2, initialized.obj);
-                if (null == initialized.key)
+                var converted = ConvertValueIfNeed(initialized.Obj.GetType(), typeArg2, initialized.Obj);
+                if (null == initialized.Key)
                 {
                   throw new InvalidOperationException("Key is not specified for item of dictionary");
                 }
 
-                methodInfo.Invoke(dictionary, new[] { initialized.key, converted });
+                methodInfo.Invoke(dictionary, new[] { initialized.Key, converted });
               }
               else
               {
                 // Handle as property - call setter with conversion if need
-                property.SetValue(Top.obj, ConvertValueIfNeed(
-                    initialized.obj.GetType(), property.PropertyType, initialized.obj),
+                property.SetValue(Top.Obj, ConvertValueIfNeed(
+                    initialized.Obj.GetType(), property.PropertyType, initialized.Obj),
                   null);
               }
             }
@@ -511,14 +511,14 @@ namespace Xaml
         }
 
         // Если у объекта задан x:Id, добавить его в objectsById
-        if (initialized.id != null)
+        if (initialized.Id != null)
         {
-          if (_objectsById.ContainsKey(initialized.id))
+          if (_objectsById.ContainsKey(initialized.Id))
           {
-            throw new InvalidOperationException(string.Format("Object with Id={0} redefinition.", initialized.id));
+            throw new InvalidOperationException(string.Format("Object with Id={0} redefinition.", initialized.Id));
           }
 
-          _objectsById.Add(initialized.id, initialized.obj);
+          _objectsById.Add(initialized.Id, initialized.Obj);
 
           ProcessFixupTokens();
         }
