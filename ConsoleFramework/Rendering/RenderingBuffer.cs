@@ -12,7 +12,7 @@ namespace ConsoleFramework.Rendering
   /// </summary>
   public sealed class RenderingBuffer
   {
-    private CHAR_INFO[,] buffer;
+    private CHAR_INFO[,] _buffer;
 
     /// <summary> todo : convert to enum
     /// 0 - непрозрачный пиксель
@@ -25,20 +25,21 @@ namespace ConsoleFramework.Rendering
     /// 6 - то же, что и 2, но пропускает через себя события мыши
     /// 7 - то же, что и 3, но пропускает через себя события мыши
     /// </summary>
-    private int[,] opacityMatrix;
+    private int[,] _opacityMatrix;
 
     // todo : add bool hasOpacityAttributes and optimize this
-    private int width;
-    private int height;
+    private int _width;
 
     public int Width
     {
-      get { return width; }
+      get { return _width; }
     }
+
+    private int _height;
 
     public int Height
     {
-      get { return height; }
+      get { return _height; }
     }
 
     public RenderingBuffer()
@@ -47,25 +48,25 @@ namespace ConsoleFramework.Rendering
 
     public RenderingBuffer(int width, int height)
     {
-      buffer = new CHAR_INFO[width, height];
-      opacityMatrix = new int[width, height];
-      this.width = width;
-      this.height = height;
+      _buffer = new CHAR_INFO[width, height];
+      _opacityMatrix = new int[width, height];
+      this._width = width;
+      this._height = height;
     }
 
     public void CopyFrom(RenderingBuffer renderingBuffer)
     {
-      this.buffer = new CHAR_INFO[renderingBuffer.width, renderingBuffer.height];
-      this.opacityMatrix = new int[renderingBuffer.width, renderingBuffer.height];
-      this.width = renderingBuffer.width;
-      this.height = renderingBuffer.height;
+      this._buffer = new CHAR_INFO[renderingBuffer._width, renderingBuffer._height];
+      this._opacityMatrix = new int[renderingBuffer._width, renderingBuffer._height];
+      this._width = renderingBuffer._width;
+      this._height = renderingBuffer._height;
       //
-      for (int x = 0; x < width; x++)
+      for (var x = 0; x < _width; x++)
       {
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < _height; y++)
         {
-          buffer[x, y] = renderingBuffer.buffer[x, y];
-          opacityMatrix[x, y] = renderingBuffer.opacityMatrix[x, y];
+          _buffer[x, y] = renderingBuffer._buffer[x, y];
+          _opacityMatrix[x, y] = renderingBuffer._opacityMatrix[x, y];
         }
       }
     }
@@ -84,8 +85,12 @@ namespace ConsoleFramework.Rendering
     /// <param name="renderSlotRect">Размер и положение слота, выделенного дочернему элементу.</param>
     /// <param name="layoutClip">Часть дочернего буфера, которая будет отрисована - по размеру может быть
     /// меньше или равна RenderSlotRect.Size. По координатам соотносится с childBuffer.</param>
-    public void ApplyChild(RenderingBuffer childBuffer, Vector actualOffset,
-      Size childRenderSize, Rect renderSlotRect, Rect layoutClip)
+    public void ApplyChild(
+      RenderingBuffer childBuffer,
+      Vector actualOffset,
+      Size childRenderSize,
+      Rect renderSlotRect,
+      Rect layoutClip)
     {
       ApplyChild(childBuffer, actualOffset, childRenderSize, renderSlotRect, layoutClip, null);
     }
@@ -101,15 +106,21 @@ namespace ConsoleFramework.Rendering
     /// <param name="renderSlotRect"></param>
     /// <param name="layoutClip"></param>
     /// <param name="affectedRect">Прямоугольник в дочернем контроле, который был изменен.</param>
-    public void ApplyChild(RenderingBuffer childBuffer, Vector actualOffset,
-      Size childRenderSize, Rect renderSlotRect,
-      Rect layoutClip, Rect? affectedRect)
+    public void ApplyChild(
+      RenderingBuffer childBuffer,
+      Vector actualOffset,
+      Size childRenderSize,
+      Rect renderSlotRect,
+      Rect layoutClip,
+      Rect? affectedRect)
     {
       // Считаем finalRect - прямоугольник относительно parent, который нужно закрасить
-      Rect finalRect = layoutClip;
+      var finalRect = layoutClip;
 
       if (affectedRect != null)
+      {
         finalRect.Intersect(affectedRect.Value);
+      }
 
       // Если child.RenderSlotRect больше child.RenderSize, а rendering buffer
       // дочернего контрола больше его RenderSize (такое бывает после уменьшения
@@ -119,32 +130,35 @@ namespace ConsoleFramework.Rendering
       finalRect.Intersect(new Rect(new Point(0, 0), childRenderSize));
 
       // Because cannot call Offset() method of empty rect
-      if (finalRect.IsEmpty) return;
+      if (finalRect.IsEmpty)
+      {
+        return;
+      }
 
       finalRect.Offset(actualOffset);
       finalRect.Intersect(renderSlotRect);
 
       // Нужно также учесть размеры буфера текущего контрола
-      finalRect.Intersect(new Rect(new Point(0, 0), new Size(this.width, this.height)));
+      finalRect.Intersect(new Rect(new Point(0, 0), new Size(this._width, this._height)));
 
-      for (int x = finalRect.Left; x < finalRect.Right; x++)
+      for (var x = finalRect.Left; x < finalRect.Right; x++)
       {
-        int parentX = x;
-        int childX = parentX - actualOffset.X;
-        for (int y = finalRect.Top; y < finalRect.Bottom; y++)
+        var parentX = x;
+        var childX = parentX - actualOffset.X;
+        for (var y = finalRect.Top; y < finalRect.Bottom; y++)
         {
-          int parentY = y;
-          int childY = parentY - actualOffset.Y;
+          var parentY = y;
+          var childY = parentY - actualOffset.Y;
 
-          CHAR_INFO charInfo = childBuffer.buffer[childX, childY];
-          int opacity = childBuffer.opacityMatrix[childX, childY];
+          var charInfo = childBuffer._buffer[childX, childY];
+          var opacity = childBuffer._opacityMatrix[childX, childY];
 
           // Для полностью прозрачных пикселей родительского буфера - присваиваем и значение
           // пикселя, и значение opacity, дальше дело за следующим родителем
-          if (this.opacityMatrix[parentX, parentY] == 2 || this.opacityMatrix[parentX, parentY] == 6)
+          if (this._opacityMatrix[parentX, parentY] == 2 || this._opacityMatrix[parentX, parentY] == 6)
           {
-            this.buffer[parentX, parentY] = charInfo;
-            this.opacityMatrix[parentX, parentY] = opacity;
+            this._buffer[parentX, parentY] = charInfo;
+            this._opacityMatrix[parentX, parentY] = opacity;
           }
           else
           {
@@ -152,18 +166,18 @@ namespace ConsoleFramework.Rendering
             // сам пиксель зависит от opacity дочернего элемента
             if (opacity == 0 || opacity == 4)
             {
-              this.buffer[parentX, parentY] = charInfo;
+              this._buffer[parentX, parentY] = charInfo;
             }
             else if (opacity == 1 || opacity == 5)
             {
               charInfo.Attributes = Colors.Blend(Color.DarkGray, Color.Black);
-              charInfo.UnicodeChar = buffer[parentX, parentY].UnicodeChar;
-              buffer[parentX, parentY] = charInfo;
+              charInfo.UnicodeChar = _buffer[parentX, parentY].UnicodeChar;
+              _buffer[parentX, parentY] = charInfo;
             }
             else if (opacity == 3 || opacity == 7)
             {
               // берем фоновые атрибуты символа из родительского буфера
-              Attr parentAttr = buffer[parentX, parentY].Attributes;
+              var parentAttr = _buffer[parentX, parentY].Attributes;
               if ((parentAttr & Attr.BACKGROUND_BLUE) == Attr.BACKGROUND_BLUE)
               {
                 charInfo.Attributes |= Attr.BACKGROUND_BLUE;
@@ -200,7 +214,7 @@ namespace ConsoleFramework.Rendering
                 charInfo.Attributes &= ~Attr.BACKGROUND_INTENSITY;
               }
 
-              buffer[parentX, parentY] = charInfo;
+              _buffer[parentX, parentY] = charInfo;
             }
           }
         }
@@ -209,67 +223,78 @@ namespace ConsoleFramework.Rendering
 
     public void SetPixelSafe(int x, int y, char c)
     {
-      if (buffer.GetLength(0) > x && buffer.GetLength(1) > y)
+      if (_buffer.GetLength(0) > x && _buffer.GetLength(1) > y)
+      {
         SetPixel(x, y, c);
+      }
     }
 
     public void SetPixelSafe(int x, int y, Attr attr)
     {
-      if (buffer.GetLength(0) > x && buffer.GetLength(1) > y)
+      if (_buffer.GetLength(0) > x && _buffer.GetLength(1) > y)
+      {
         SetPixel(x, y, attr);
+      }
     }
 
     public void SetPixelSafe(int x, int y, char c, Attr attr)
     {
-      if (buffer.GetLength(0) > x && buffer.GetLength(1) > y)
+      if (_buffer.GetLength(0) > x && _buffer.GetLength(1) > y)
+      {
         SetPixel(x, y, c, attr);
+      }
     }
 
     public void SetPixel(int x, int y, char c)
     {
-      buffer[x, y].UnicodeChar = c;
+      _buffer[x, y].UnicodeChar = c;
     }
 
     public void SetPixel(int x, int y, Attr attr)
     {
-      buffer[x, y].Attributes = attr;
+      _buffer[x, y].Attributes = attr;
     }
 
     public void SetPixel(int x, int y, char c, Attr attr)
     {
-      buffer[x, y].UnicodeChar = c;
-      buffer[x, y].Attributes = attr;
+      _buffer[x, y].UnicodeChar = c;
+      _buffer[x, y].Attributes = attr;
     }
 
     public void SetOpacity(int x, int y, int opacity)
     {
       if (opacity < 0 || opacity > 7)
+      {
         throw new ArgumentException("opacity");
-      //
-      opacityMatrix[x, y] = opacity;
+      }
+
+      _opacityMatrix[x, y] = opacity;
     }
 
     public void SetOpacityRect(int x, int y, int w, int h, int opacity)
     {
       if (opacity < 0 || opacity > 7)
-        throw new ArgumentException("opacity");
-      for (int i = 0; i < w; i++)
       {
-        int _x = x + i;
-        for (int j = 0; j < h; j++)
+        throw new ArgumentException("opacity");
+      }
+
+      for (var i = 0; i < w; i++)
+      {
+        var xOther = x + i;
+        for (var j = 0; j < h; j++)
         {
-          opacityMatrix[_x, y + j] = opacity;
+          _opacityMatrix[xOther, y + j] = opacity;
         }
       }
     }
 
     public void FillRectangle(int x, int y, int w, int h, char c, Attr attributes)
     {
-      for (int _x = 0; _x < w; _x++)
+      for (var xOther = 0; xOther < w; xOther++)
       {
-        for (int _y = 0; _y < h; _y++)
+        for (var yOther = 0; yOther < h; yOther++)
         {
-          SetPixel(x + _x, y + _y, c, attributes);
+          SetPixel(x + xOther, y + yOther, c, attributes);
         }
       }
     }
@@ -283,21 +308,21 @@ namespace ConsoleFramework.Rendering
     /// <param name="offset">В какой точке экрана размещен контрол (см <see cref="Renderer.RootElementRect"/>).</param>
     public void CopyToPhysicalCanvas(PhysicalCanvas canvas, Rect affectedRect, Point offset)
     {
-      Rect rectToCopy = affectedRect;
-      Rect bufferRect = new Rect(new Point(0, 0), new Size(this.width, this.height));
-      Rect canvasRect = new Rect(new Point(-offset.X, -offset.Y), canvas.Size);
+      var rectToCopy = affectedRect;
+      var bufferRect = new Rect(new Point(0, 0), new Size(this._width, this._height));
+      var canvasRect = new Rect(new Point(-offset.X, -offset.Y), canvas.Size);
       rectToCopy.Intersect(canvasRect);
       rectToCopy.Intersect(bufferRect);
-      //
-      for (int x = 0; x < rectToCopy.Width; x++)
+
+      for (var x = 0; x < rectToCopy.Width; x++)
       {
-        int bufferX = x + rectToCopy.X;
-        int canvasX = x + rectToCopy.X + offset.X;
-        for (int y = 0; y < rectToCopy.Height; y++)
+        var bufferX = x + rectToCopy.X;
+        var canvasX = x + rectToCopy.X + offset.X;
+        for (var y = 0; y < rectToCopy.Height; y++)
         {
-          int bufferY = y + rectToCopy.Y;
-          int canvasY = y + rectToCopy.Y + offset.Y;
-          CHAR_INFO charInfo = buffer[bufferX, bufferY];
+          var bufferY = y + rectToCopy.Y;
+          var canvasY = y + rectToCopy.Y + offset.Y;
+          var charInfo = _buffer[bufferX, bufferY];
           canvas[canvasX][canvasY].Assign(charInfo);
         }
       }
@@ -308,24 +333,24 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public void Clear()
     {
-      for (int x = 0; x < width; x++)
+      for (var x = 0; x < _width; x++)
       {
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < _height; y++)
         {
-          buffer[x, y] = new CHAR_INFO();
-          opacityMatrix[x, y] = 0;
+          _buffer[x, y] = new CHAR_INFO();
+          _opacityMatrix[x, y] = 0;
         }
       }
     }
 
     public void DumpOpacityMatrix()
     {
-      for (int y = 0; y < height; y++)
+      for (var y = 0; y < _height; y++)
       {
-        StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < width; x++)
+        var sb = new StringBuilder();
+        for (var x = 0; x < _width; x++)
         {
-          sb.Append(opacityMatrix[x, y]);
+          sb.Append(_opacityMatrix[x, y]);
         }
 
         Debug.WriteLine(sb);
@@ -340,11 +365,11 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public bool ContainsOpacity(Rect affectedRect)
     {
-      for (int x = 0; x < affectedRect.Width; x++)
+      for (var x = 0; x < affectedRect.Width; x++)
       {
         for (int y = 0; y < affectedRect.Height; y++)
         {
-          if (opacityMatrix[x + affectedRect.X, y + affectedRect.Y] != 0)
+          if (_opacityMatrix[x + affectedRect.X, y + affectedRect.Y] != 0)
           {
             return true;
           }
@@ -359,12 +384,12 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public int GetOpacityAt(int x, int y)
     {
-      return opacityMatrix[x, y];
+      return _opacityMatrix[x, y];
     }
 
     public void RenderStringSafe(string s, int x, int y, Attr attr)
     {
-      for (int i = 0; i < s.Length; i++)
+      for (var i = 0; i < s.Length; i++)
       {
         SetPixelSafe(x + i, y, s[i], attr);
       }
