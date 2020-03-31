@@ -81,8 +81,8 @@ namespace ConsoleFramework.Core {
             if (size.IsEmpty) {
                 this = s_empty;
             } else {
-                this.x = location._x;
-                this.y = location._y;
+                this.x = location.X;
+                this.y = location.Y;
                 this.width = size._width;
                 this.height = size._height;
             }
@@ -99,10 +99,10 @@ namespace ConsoleFramework.Core {
         }
 
         public Rect(Point point1, Point point2) {
-            this.x = Math.Min(point1._x, point2._x);
-            this.y = Math.Min(point1._y, point2._y);
-            this.width = Math.Max((Math.Max(point1._x, point2._x) - this.x), 0);
-            this.height = Math.Max((Math.Max(point1._y, point2._y) - this.y), 0);
+            this.x = Math.Min(point1.X, point2.X);
+            this.y = Math.Min(point1.Y, point2.Y);
+            this.width = Math.Max((Math.Max(point1.X, point2.X) - this.x), 0);
+            this.height = Math.Max((Math.Max(point1.Y, point2.Y) - this.y), 0);
         }
 
         public Rect(Point point, Vector vector) : this(point, point + vector) {
@@ -138,8 +138,8 @@ namespace ConsoleFramework.Core {
                 if (this.IsEmpty) {
                     throw new InvalidOperationException("Rect_CannotModifyEmptyRect");
                 }
-                this.x = value._x;
-                this.y = value._y;
+                this.x = value.X;
+                this.y = value.Y;
             }
         }
 
@@ -272,7 +272,7 @@ namespace ConsoleFramework.Core {
         }
 
         public bool Contains(Point point) {
-            return this.Contains(point._x, point._y);
+            return this.Contains(point.X, point.Y);
         }
 
         public bool Contains(int _x, int _y) {
@@ -357,8 +357,8 @@ namespace ConsoleFramework.Core {
             if (this.IsEmpty) {
                 throw new InvalidOperationException("Rect_CannotCallMethod");
             }
-            this.x += offsetVector._x;
-            this.y += offsetVector._y;
+            this.x += offsetVector.X;
+            this.y += offsetVector.Y;
         }
 
         public void Offset(int offsetX, int offsetY) {
@@ -413,7 +413,7 @@ namespace ConsoleFramework.Core {
             // исправлено нестрогое условие на строгое
             // чтобы в rect(1;1;1;1) попадал только 1 пиксель (1;1) а не 4 пикселя (1;1)-(2;2)
             return ((((_x >= this.x) && ((_x - this.width) < this.x)) && (_y >= this.y)) && ((_y - this.height) < this.y));
-            //return ((((_x >= this._x) && ((_x - this.width) <= this._x)) && (_y >= this._y)) && ((_y - this.height) <= this._y));
+            //return ((((_x >= this.X) && ((_x - this.width) <= this.X)) && (_y >= this.Y)) && ((_y - this.height) <= this.Y));
         }
 
         private static Rect CreateEmptyRect() {

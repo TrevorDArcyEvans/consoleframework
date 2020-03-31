@@ -24,7 +24,7 @@ namespace ConsoleFramework.Controls
     private void mouseDown(object sender, MouseButtonEventArgs args)
     {
       var pos = args.GetPosition(this);
-      if (pos._y > 2)
+      if (pos.Y > 2)
       {
         return;
       }

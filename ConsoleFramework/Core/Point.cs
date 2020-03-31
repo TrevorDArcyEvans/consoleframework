@@ -37,73 +37,60 @@
     {
       return (this.X.GetHashCode() ^ this.Y.GetHashCode());
     }
-
-    internal int _x;
-
-    public int X
-    {
-      get { return this._x; }
-      set { this._x = value; }
-    }
-
-    internal int _y;
-
-    public int Y
-    {
-      get { return this._y; }
-      set { this._y = value; }
-    }
+    
+    public int X { get; set; }
+    public int Y { get; set; }
 
     public Point(int x, int y)
     {
-      this._x = x;
-      this._y = y;
+      this.X = x;
+      this.Y = y;
     }
 
     public void Offset(int offsetX, int offsetY)
     {
-      this._x += offsetX;
-      this._y += offsetY;
+      this.X += offsetX;
+      this.Y += offsetY;
     }
 
     public static Point operator +(Point point, Vector vector)
     {
-      return new Point(point._x + vector._x, point._y + vector._y);
+      return new Point(point.X + vector.X, point.Y + vector.Y);
     }
 
     public static Point Add(Point point, Vector vector)
     {
-      return new Point(point._x + vector._x, point._y + vector._y);
+      return new Point(point.X + vector.X, point.Y + vector.Y);
     }
 
     public static Point operator -(Point point, Vector vector)
     {
-      return new Point(point._x - vector._x, point._y - vector._y);
+      return new Point(point.X - vector.X, point.Y - vector.Y);
     }
 
     public static Point Subtract(Point point, Vector vector)
     {
-      return new Point(point._x - vector._x, point._y - vector._y);
+      return new Point(point.X - vector.X, point.Y - vector.Y);
     }
 
     public static Vector operator -(Point point1, Point point2)
     {
-      return new Vector(point1._x - point2._x, point1._y - point2._y);
+      return new Vector(point1.X - point2.X, point1.Y - point2.Y);
     }
 
     public static Vector Subtract(Point point1, Point point2)
     {
-      return new Vector(point1._x - point2._x, point1._y - point2._y);
+      return new Vector(point1.X - point2.X, point1.Y - point2.Y);
     }
 
     public static explicit operator Vector(Point point)
     {
-      return new Vector(point._x, point._y);
+      return new Vector(point.X, point.Y);
     }
 
     public override string ToString()
     {
-      return string.Format("{0};{1}", _x, _y);
+      return string.Format("{0};{1}", X, Y);
     }
   }
 }

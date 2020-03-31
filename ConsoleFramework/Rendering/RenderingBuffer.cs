@@ -123,10 +123,10 @@ namespace ConsoleFramework.Rendering
 
             for ( int x = finalRect.Left; x < finalRect.Right; x++ ) {
                 int parentX = x;
-                int childX = parentX - actualOffset._x;
+                int childX = parentX - actualOffset.X;
                 for ( int y = finalRect.Top; y < finalRect.Bottom; y++ ) {
                     int parentY = y;
-                    int childY = parentY - actualOffset._y;
+                    int childY = parentY - actualOffset.Y;
 
                     CHAR_INFO charInfo = childBuffer.buffer[childX, childY];
                     int opacity = childBuffer.opacityMatrix[childX, childY];
@@ -245,10 +245,10 @@ namespace ConsoleFramework.Rendering
             //
             for (int x = 0; x < rectToCopy.width; x++) {
                 int bufferX = x + rectToCopy.x;
-                int canvasX = x + rectToCopy.x + offset._x;
+                int canvasX = x + rectToCopy.x + offset.X;
                 for (int y = 0; y < rectToCopy.height; y++) {
                     int bufferY = y + rectToCopy.y;
-                    int canvasY = y + rectToCopy.y + offset._y;
+                    int canvasY = y + rectToCopy.y + offset.Y;
                     CHAR_INFO charInfo = buffer[bufferX, bufferY];
                     canvas[canvasX][canvasY].Assign(charInfo);
                 }

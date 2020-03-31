@@ -279,8 +279,8 @@ namespace ConsoleFramework.Rendering
         }
 
         Rect parentAffectedRect = control.RenderSlotRect;
-        parentAffectedRect.Intersect(new Rect(affectedRect.x + control.ActualOffset._x,
-          affectedRect.y + control.ActualOffset._y,
+        parentAffectedRect.Intersect(new Rect(affectedRect.x + control.ActualOffset.X,
+          affectedRect.y + control.ActualOffset.Y,
           affectedRect.width,
           affectedRect.height));
         // нет смысла продолжать подъем вверх по дереву, если контрола точно уже не видно

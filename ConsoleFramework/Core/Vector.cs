@@ -6,12 +6,12 @@ namespace ConsoleFramework.Core
   {
     public override string ToString()
     {
-      return string.Format("{0};{1}", _x, _y);
+      return string.Format("{0};{1}", X, Y);
     }
 
     public static bool operator ==(Vector vector1, Vector vector2)
     {
-      return vector1.X == vector2.X && 
+      return vector1.X == vector2.X &&
              vector1.Y == vector2.Y;
     }
 
@@ -22,7 +22,7 @@ namespace ConsoleFramework.Core
 
     public static bool Equals(Vector vector1, Vector vector2)
     {
-      return vector1.X.Equals(vector2.X) && 
+      return vector1.X.Equals(vector2.X) &&
              vector1.Y.Equals(vector2.Y);
     }
 
@@ -47,127 +47,117 @@ namespace ConsoleFramework.Core
       return (this.X.GetHashCode() ^ this.Y.GetHashCode());
     }
 
-    internal int _x;
-    public int X
-    {
-      get { return this._x; }
-      set { this._x = value; }
-    }
+    public int X { get; set; }
 
-    internal int _y;
-    public int Y
-    {
-      get { return this._y; }
-      set { this._y = value; }
-    }
+    public int Y { get; set; }
 
     public Vector(int x, int y)
     {
-      this._x = x;
-      this._y = y;
+      X = x;
+      Y = y;
     }
 
     public double Length
     {
-      get { return Math.Sqrt(_x * _x + _y * _y); }
+      get { return Math.Sqrt(X * X + Y * Y); }
     }
 
     public double LengthSquared
     {
-      get { return ((this._x * this._x) + (this._y * this._y)); }
+      get { return ((this.X * this.X) + (this.Y * this.Y)); }
     }
 
     public static double CrossProduct(Vector vector1, Vector vector2)
     {
-      return ((vector1._x * vector2._y) - (vector1._y * vector2._x));
+      return ((vector1.X * vector2.Y) - (vector1.Y * vector2.X));
     }
 
     public static double AngleBetween(Vector vector1, Vector vector2)
     {
-      double y = (vector1._x * vector2._y) - (vector2._x * vector1._y);
-      double x = (vector1._x * vector2._x) + (vector1._y * vector2._y);
+      double y = (vector1.X * vector2.Y) - (vector2.X * vector1.Y);
+      double x = (vector1.X * vector2.X) + (vector1.Y * vector2.Y);
       return (Math.Atan2(y, x) * 57.295779513082323);
     }
 
     public static Vector operator -(Vector vector)
     {
-      return new Vector(-vector._x, -vector._y);
+      return new Vector(-vector.X, -vector.Y);
     }
 
     public void Negate()
     {
-      this._x = -this._x;
-      this._y = -this._y;
+      this.X = -this.X;
+      this.Y = -this.Y;
     }
 
     public static Vector operator +(Vector vector1, Vector vector2)
     {
-      return new Vector(vector1._x + vector2._x, vector1._y + vector2._y);
+      return new Vector(vector1.X + vector2.X, vector1.Y + vector2.Y);
     }
 
     public static Vector Add(Vector vector1, Vector vector2)
     {
-      return new Vector(vector1._x + vector2._x, vector1._y + vector2._y);
+      return new Vector(vector1.X + vector2.X, vector1.Y + vector2.Y);
     }
 
     public static Vector operator -(Vector vector1, Vector vector2)
     {
-      return new Vector(vector1._x - vector2._x, vector1._y - vector2._y);
+      return new Vector(vector1.X - vector2.X, vector1.Y - vector2.Y);
     }
 
     public static Vector Subtract(Vector vector1, Vector vector2)
     {
-      return new Vector(vector1._x - vector2._x, vector1._y - vector2._y);
+      return new Vector(vector1.X - vector2.X, vector1.Y - vector2.Y);
     }
 
     public static Point operator +(Vector vector, Point point)
     {
-      return new Point(point._x + vector._x, point._y + vector._y);
+      return new Point(point.X + vector.X, point.Y + vector.Y);
     }
 
     public static Point Add(Vector vector, Point point)
     {
-      return new Point(point._x + vector._x, point._y + vector._y);
+      return new Point(point.X + vector.X, point.Y + vector.Y);
     }
 
     public static Vector operator *(Vector vector, int scalar)
     {
-      return new Vector(vector._x * scalar, vector._y * scalar);
+      return new Vector(vector.X * scalar, vector.Y * scalar);
     }
 
     public static Vector Multiply(Vector vector, int scalar)
     {
-      return new Vector(vector._x * scalar, vector._y * scalar);
+      return new Vector(vector.X * scalar, vector.Y * scalar);
     }
 
     public static Vector operator *(int scalar, Vector vector)
     {
-      return new Vector(vector._x * scalar, vector._y * scalar);
+      return new Vector(vector.X * scalar, vector.Y * scalar);
     }
 
     public static Vector Multiply(int scalar, Vector vector)
     {
-      return new Vector(vector._x * scalar, vector._y * scalar);
+      return new Vector(vector.X * scalar, vector.Y * scalar);
     }
 
     public static double operator *(Vector vector1, Vector vector2)
     {
-      return ((vector1._x * vector2._x) + (vector1._y * vector2._y));
+      return ((vector1.X * vector2.X) + (vector1.Y * vector2.Y));
     }
 
     public static double Multiply(Vector vector1, Vector vector2)
     {
-      return ((vector1._x * vector2._x) + (vector1._y * vector2._y));
+      return ((vector1.X * vector2.X) + (vector1.Y * vector2.Y));
     }
 
     public static double Determinant(Vector vector1, Vector vector2)
     {
-      return vector1._x * vector2._y - vector1._y * vector2._x;
+      return vector1.X * vector2.Y - vector1.Y * vector2.X;
     }
 
     public static explicit operator Point(Vector vector)
     {
-      return new Point(vector._x, vector._y);
+      return new Point(vector.X, vector.Y);
     }
   }
 }

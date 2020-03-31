@@ -269,7 +269,7 @@ namespace ConsoleFramework.Controls
       {
         var point = args.GetPosition(this);
         var parentPoint = args.GetPosition(GetWindowsHost());
-        if (point._y == 0 && point._x == 3)
+        if (point.Y == 0 && point.X == 3)
         {
           _closing = true;
           _showClosingGlyph = true;
@@ -278,7 +278,7 @@ namespace ConsoleFramework.Controls
           Invalidate();
           args.Handled = true;
         }
-        else if (point._y == 0)
+        else if (point.Y == 0)
         {
           _moving = true;
           _movingStartPoint = parentPoint;
@@ -289,7 +289,7 @@ namespace ConsoleFramework.Controls
           Invalidate();
           args.Handled = true;
         }
-        else if (point._x == ActualWidth - 3 && point._y == ActualHeight - 2)
+        else if (point.X == ActualWidth - 3 && point.Y == ActualHeight - 2)
         {
           _resizing = true;
           _resizingStartPoint = parentPoint;
@@ -325,7 +325,7 @@ namespace ConsoleFramework.Controls
       if (_closing)
       {
         Point point = args.GetPosition(this);
-        if (point._x == 3 && point._y == 0)
+        if (point.X == 3 && point.Y == 0)
         {
           this.HandleClosing();
         }
@@ -360,7 +360,7 @@ namespace ConsoleFramework.Controls
       {
         var point = args.GetPosition(this);
         var anyChanged = false;
-        if (point._x == 3 && point._y == 0)
+        if (point.X == 3 && point.Y == 0)
         {
           if (!_showClosingGlyph)
           {
@@ -385,7 +385,7 @@ namespace ConsoleFramework.Controls
       if (_moving)
       {
         var parentPoint = args.GetPosition(GetWindowsHost());
-        var vector = new Vector(parentPoint.X - _movingStartPoint._x, parentPoint.Y - _movingStartPoint._y);
+        var vector = new Vector(parentPoint.X - _movingStartPoint.X, parentPoint.Y - _movingStartPoint.Y);
         X = _movingStartX + vector.X;
         Y = _movingStartY + vector.Y;
         GetWindowsHost().Invalidate();
@@ -395,8 +395,8 @@ namespace ConsoleFramework.Controls
       if (_resizing)
       {
         var parentPoint = args.GetPosition(GetWindowsHost());
-        var deltaWidth = parentPoint.X - _resizingStartPoint._x;
-        var deltaHeight = parentPoint.Y - _resizingStartPoint._y;
+        var deltaWidth = parentPoint.X - _resizingStartPoint.X;
+        var deltaHeight = parentPoint.Y - _resizingStartPoint.Y;
         var width = _resizingStartWidth + deltaWidth;
         var height = _resizingStartHeight + deltaHeight;
         var anyChanged = false;

@@ -388,11 +388,11 @@ namespace ConsoleFramework
     {
       if (!_usingLinux)
       {
-        Win32.SetConsoleCursorPosition(_stdOutputHandle, new COORD((short) position._x, (short) position._y));
+        Win32.SetConsoleCursorPosition(_stdOutputHandle, new COORD((short) position.X, (short) position.Y));
       }
       else
       {
-        NCurses.move(position._y, position._x);
+        NCurses.move(position.Y, position.X);
         NCurses.refresh();
       }
     }
