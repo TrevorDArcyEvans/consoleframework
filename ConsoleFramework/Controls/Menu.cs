@@ -135,11 +135,11 @@ namespace ConsoleFramework.Controls
     public void CloseAllSubmenus()
     {
       var expandedSubmenus = new List<MenuItem>();
-      var currentItem = (MenuItem) this.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).expanded);
+      var currentItem = (MenuItem) this.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).Expanded);
       while (null != currentItem)
       {
         expandedSubmenus.Add(currentItem);
-        currentItem = (MenuItem) currentItem.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).expanded);
+        currentItem = (MenuItem) currentItem.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).Expanded);
       }
 
       expandedSubmenus.Reverse();

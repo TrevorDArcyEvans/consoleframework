@@ -26,9 +26,9 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public void ReinitializePopup()
     {
-      if (null != popup)
+      if (null != _popup)
       {
-        popup.DisconnectMenuItems();
+        _popup.DisconnectMenuItems();
       }
     }
 
@@ -40,7 +40,7 @@ namespace ConsoleFramework.Controls
 
     private bool _expanded;
 
-    internal bool expanded
+    internal bool Expanded
     {
       get { return _expanded; }
       private set
@@ -97,7 +97,7 @@ namespace ConsoleFramework.Controls
       // Stretch by default
       HorizontalAlignment = HorizontalAlignment.Stretch;
 
-      items.ListChanged += (sender, args) =>
+      _items.ListChanged += (sender, args) =>
       {
         switch (args.Type)
         {
@@ -105,7 +105,7 @@ namespace ConsoleFramework.Controls
           {
             for (var i = 0; i < args.Count; i++)
             {
-              var itemBase = items[args.Index + i];
+              var itemBase = _items[args.Index + i];
               if (itemBase is MenuItem)
               {
                 (itemBase as MenuItem).ParentItem = this;
@@ -116,7 +116,7 @@ namespace ConsoleFramework.Controls
           }
 
           case ListChangedEventType.ItemsRemoved:
-            foreach (object removedItem in args.RemovedItems)
+            foreach (var removedItem in args.RemovedItems)
             {
               if (removedItem is MenuItem)
               {
@@ -128,11 +128,13 @@ namespace ConsoleFramework.Controls
 
           case ListChangedEventType.ItemReplaced:
           {
-            object removedItem = args.RemovedItems[0];
+            var removedItem = args.RemovedItems[0];
             if (removedItem is MenuItem)
+            {
               (removedItem as MenuItem).ParentItem = null;
+            }
 
-            MenuItemBase itemBase = items[args.Index];
+            var itemBase = _items[args.Index];
             if (itemBase is MenuItem)
             {
               (itemBase as MenuItem).ParentItem = this;
@@ -191,20 +193,20 @@ namespace ConsoleFramework.Controls
       args.Handled = true;
     }
 
-    private Popup popup;
+    private Popup _popup;
 
     private void OpenMenu()
     {
-      if (expanded)
+      if (Expanded)
       {
         return;
       }
 
       if (this.Type == MenuItemType.Submenu || Type == MenuItemType.RootSubmenu)
       {
-        if (null == popup)
+        if (null == _popup)
         {
-          popup = new Popup(this.Items, this._popupShadow, this.ActualWidth);
+          _popup = new Popup(this.Items, this._popupShadow, this.ActualWidth);
           foreach (MenuItemBase itemBase in this.Items)
           {
             if (itemBase is MenuItem)
@@ -213,22 +215,22 @@ namespace ConsoleFramework.Controls
             }
           }
 
-          popup.AddHandler(Window.ClosedEvent, new EventHandler(OnPopupClosed));
+          _popup.AddHandler(Window.ClosedEvent, new EventHandler(OnPopupClosed));
         }
 
         var windowsHost = VisualTreeHelper.FindClosestParent<WindowsHost>(this);
         var point = TranslatePoint(this, new Point(0, 0), windowsHost);
-        popup.X = point.X;
-        popup.Y = point.Y;
-        windowsHost.ShowModal(popup, true);
-        expanded = true;
+        _popup.X = point.X;
+        _popup.Y = point.Y;
+        windowsHost.ShowModal(_popup, true);
+        Expanded = true;
       }
     }
 
     private void OnPopupClosed(object sender, EventArgs eventArgs)
     {
-      assert(expanded);
-      expanded = false;
+      assert(Expanded);
+      Expanded = false;
     }
 
     public string Title { get; set; }
@@ -253,11 +255,11 @@ namespace ConsoleFramework.Controls
 
     public MenuItemType Type { get; set; }
 
-    private readonly ObservableList<MenuItemBase> items = new ObservableList<MenuItemBase>(new List<MenuItemBase>());
+    private readonly ObservableList<MenuItemBase> _items = new ObservableList<MenuItemBase>(new List<MenuItemBase>());
 
     public IList<MenuItemBase> Items
     {
-      get { return items; }
+      get { return _items; }
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -265,7 +267,7 @@ namespace ConsoleFramework.Controls
       var length = 2;
       if (!string.IsNullOrEmpty(Title))
       {
-        length += getTitleLength(Title);
+        length += GetTitleLength(Title);
       }
 
       if (!string.IsNullOrEmpty(TitleRight))
@@ -284,7 +286,7 @@ namespace ConsoleFramework.Controls
     /// <summary>
     /// Counts length of string to be rendered with underscore prefixes on.
     /// </summary>
-    private static int getTitleLength(String title)
+    private static int GetTitleLength(string title)
     {
       var underscore = false;
       var len = 0;
@@ -315,7 +317,7 @@ namespace ConsoleFramework.Controls
     {
       Attr captionAttrs;
       Attr specialAttrs;
-      if (HasFocus || this.expanded)
+      if (HasFocus || this.Expanded)
       {
         captionAttrs = Colors.Blend(Color.Black, Color.DarkGreen);
         specialAttrs = Colors.Blend(Color.DarkRed, Color.DarkGreen);
@@ -334,7 +336,7 @@ namespace ConsoleFramework.Controls
       buffer.FillRectangle(0, 0, ActualWidth, ActualHeight, ' ', captionAttrs);
       if (null != Title)
       {
-        renderString(Title, buffer, 1, 0, ActualWidth, captionAttrs, Disabled ? captionAttrs : specialAttrs);
+        RenderString(Title, buffer, 1, 0, ActualWidth, captionAttrs, Disabled ? captionAttrs : specialAttrs);
       }
 
       if (null != TitleRight)
@@ -348,7 +350,7 @@ namespace ConsoleFramework.Controls
     /// symbol will use specialAttrs instead. To render underscore pass two underscores.
     /// Example: "_File" renders File when 'F' is rendered using specialAttrs.
     /// </summary>
-    private static int renderString(string s, RenderingBuffer buffer, int x, int y, int maxWidth, Attr attr, Attr specialAttr)
+    private static int RenderString(string s, RenderingBuffer buffer, int x, int y, int maxWidth, Attr attr, Attr specialAttr)
     {
       var underscore = false;
       var j = 0;
@@ -394,8 +396,8 @@ namespace ConsoleFramework.Controls
 
     internal void Close()
     {
-      assert(expanded);
-      popup.Close();
+      assert(Expanded);
+      _popup.Close();
     }
 
     internal void Expand()
