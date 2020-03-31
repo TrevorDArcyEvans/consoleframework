@@ -61,7 +61,7 @@ namespace ConsoleFramework.Events
         return (VirtualKeys) (((int) VirtualKeys.A) + (keyToken[0] - 0x41));
       }
 
-      VirtualKeys escape = 0;
+      VirtualKeys escape;
       switch (keyToken)
       {
         case "ENTER":
