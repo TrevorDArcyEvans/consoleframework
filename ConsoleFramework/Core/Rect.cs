@@ -82,16 +82,16 @@ namespace ConsoleFramework.Core
         "{1:" + format + "}{0}{2:" + format + "}{0}{3:" + format + "}{0}{4:" + format + "}",
         new object[]
         {
-          numericListSeparator, this.x, this.y, this.width, this.height
+          numericListSeparator, this._x, this._y, this._width, this._height
         });
     }
 
     public Rect(Rect copy)
     {
-      this.x = copy.x;
-      this.y = copy.y;
-      this.width = copy.width;
-      this.height = copy.height;
+      this._x = copy._x;
+      this._y = copy._y;
+      this._width = copy._width;
+      this._height = copy._height;
     }
 
     public Rect(Point location, Size size)
@@ -102,10 +102,10 @@ namespace ConsoleFramework.Core
       }
       else
       {
-        this.x = location.X;
-        this.y = location.Y;
-        this.width = size._width;
-        this.height = size._height;
+        this._x = location.X;
+        this._y = location.Y;
+        this._width = size._width;
+        this._height = size._height;
       }
     }
 
@@ -116,18 +116,18 @@ namespace ConsoleFramework.Core
         throw new ArgumentException("Size_WidthAndHeightCannotBeNegative");
       }
 
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
+      this._x = x;
+      this._y = y;
+      this._width = width;
+      this._height = height;
     }
 
     public Rect(Point point1, Point point2)
     {
-      this.x = Math.Min(point1.X, point2.X);
-      this.y = Math.Min(point1.Y, point2.Y);
-      this.width = Math.Max((Math.Max(point1.X, point2.X) - this.x), 0);
-      this.height = Math.Max((Math.Max(point1.Y, point2.Y) - this.y), 0);
+      this._x = Math.Min(point1.X, point2.X);
+      this._y = Math.Min(point1.Y, point2.Y);
+      this._width = Math.Max((Math.Max(point1.X, point2.X) - this._x), 0);
+      this._height = Math.Max((Math.Max(point1.Y, point2.Y) - this._y), 0);
     }
 
     public Rect(Point point, Vector vector) : this(point, point + vector)
@@ -142,9 +142,9 @@ namespace ConsoleFramework.Core
       }
       else
       {
-        this.x = this.y = 0;
-        this.width = size.Width;
-        this.height = size.Height;
+        this._x = this._y = 0;
+        this._width = size.Width;
+        this._height = size.Height;
       }
     }
 
@@ -155,12 +155,12 @@ namespace ConsoleFramework.Core
 
     public bool IsEmpty
     {
-      get { return this.width == 0 || this.height == 0; }
+      get { return this._width == 0 || this._height == 0; }
     }
 
     public Point Location
     {
-      get { return new Point(this.x, this.y); }
+      get { return new Point(this._x, this._y); }
       set
       {
         if (this.IsEmpty)
@@ -168,8 +168,8 @@ namespace ConsoleFramework.Core
           throw new InvalidOperationException("Rect_CannotModifyEmptyRect");
         }
 
-        this.x = value.X;
-        this.y = value.Y;
+        this._x = value.X;
+        this._y = value.Y;
       }
     }
 
@@ -182,7 +182,7 @@ namespace ConsoleFramework.Core
           return Size.Empty;
         }
 
-        return new Size(this.width, this.height);
+        return new Size(this._width, this._height);
       }
       set
       {
@@ -197,16 +197,16 @@ namespace ConsoleFramework.Core
             throw new InvalidOperationException("Rect_CannotModifyEmptyRect");
           }
 
-          this.width = value._width;
-          this.height = value._height;
+          this._width = value._width;
+          this._height = value._height;
         }
       }
     }
 
-    private int x;
+    private int _x;
     public int X
     {
-      get { return this.x; }
+      get { return this._x; }
       set
       {
         if (this.IsEmpty)
@@ -214,14 +214,14 @@ namespace ConsoleFramework.Core
           throw new InvalidOperationException("Rect_CannotModifyEmptyRect");
         }
 
-        this.x = value;
+        this._x = value;
       }
     }
 
-    private int y;
+    private int _y;
     public int Y
     {
-      get { return this.y; }
+      get { return this._y; }
       set
       {
         if (this.IsEmpty)
@@ -229,14 +229,14 @@ namespace ConsoleFramework.Core
           throw new InvalidOperationException("Rect_CannotModifyEmptyRect");
         }
 
-        this.y = value;
+        this._y = value;
       }
     }
 
-    private int width;
+    private int _width;
     public int Width
     {
-      get { return this.width; }
+      get { return this._width; }
       set
       {
         if (this.IsEmpty)
@@ -249,14 +249,14 @@ namespace ConsoleFramework.Core
           throw new ArgumentException("Size_WidthCannotBeNegative");
         }
 
-        this.width = value;
+        this._width = value;
       }
     }
 
-    private int height;
+    private int _height;
     public int Height
     {
-      get { return this.height; }
+      get { return this._height; }
       set
       {
         if (this.IsEmpty)
@@ -269,18 +269,18 @@ namespace ConsoleFramework.Core
           throw new ArgumentException("Size_HeightCannotBeNegative");
         }
 
-        this.height = value;
+        this._height = value;
       }
     }
 
     public int Left
     {
-      get { return this.x; }
+      get { return this._x; }
     }
 
     public int Top
     {
-      get { return this.y; }
+      get { return this._y; }
     }
 
     public int Right
@@ -292,7 +292,7 @@ namespace ConsoleFramework.Core
           return 0;
         }
 
-        return (this.x + this.width);
+        return (this._x + this._width);
       }
     }
 
@@ -305,7 +305,7 @@ namespace ConsoleFramework.Core
           return 0;
         }
 
-        return (this.y + this.height);
+        return (this._y + this._height);
       }
     }
 
@@ -334,14 +334,14 @@ namespace ConsoleFramework.Core
       return this.Contains(point.X, point.Y);
     }
 
-    public bool Contains(int _x, int _y)
+    public bool Contains(int x, int y)
     {
       if (this.IsEmpty)
       {
         return false;
       }
 
-      return this.ContainsInternal(_x, _y);
+      return this.ContainsInternal(x, y);
     }
 
     public bool Contains(Rect rect)
@@ -351,8 +351,8 @@ namespace ConsoleFramework.Core
         return false;
       }
 
-      return ((((this.x <= rect.x) && (this.y <= rect.y)) && ((this.x + this.width) >= (rect.x + rect.width))) &&
-              ((this.y + this.height) >= (rect.y + rect.height)));
+      return ((((this._x <= rect._x) && (this._y <= rect._y)) && ((this._x + this._width) >= (rect._x + rect._width))) &&
+              ((this._y + this._height) >= (rect._y + rect._height)));
     }
 
     public bool IntersectsWith(Rect rect)
@@ -376,10 +376,10 @@ namespace ConsoleFramework.Core
       {
         int num = Math.Max(this.Left, rect.Left);
         int num2 = Math.Max(this.Top, rect.Top);
-        this.width = Math.Max((Math.Min(this.Right, rect.Right) - num), 0);
-        this.height = Math.Max((Math.Min(this.Bottom, rect.Bottom) - num2), 0);
-        this.x = num;
-        this.y = num2;
+        this._width = Math.Max((Math.Min(this.Right, rect.Right) - num), 0);
+        this._height = Math.Max((Math.Min(this.Bottom, rect.Bottom) - num2), 0);
+        this._x = num;
+        this._y = num2;
       }
     }
 
@@ -401,26 +401,26 @@ namespace ConsoleFramework.Core
         int num2 = Math.Min(this.Top, rect.Top);
         if ((rect.Width == int.MaxValue) || (this.Width == int.MaxValue))
         {
-          this.width = int.MaxValue;
+          this._width = int.MaxValue;
         }
         else
         {
           int num3 = Math.Max(this.Right, rect.Right);
-          this.width = Math.Max((num3 - num), 0);
+          this._width = Math.Max((num3 - num), 0);
         }
 
         if ((rect.Height == int.MaxValue) || (this.Height == int.MaxValue))
         {
-          this.height = int.MaxValue;
+          this._height = int.MaxValue;
         }
         else
         {
           int num4 = Math.Max(this.Bottom, rect.Bottom);
-          this.height = Math.Max((num4 - num2), 0);
+          this._height = Math.Max((num4 - num2), 0);
         }
 
-        this.x = num;
-        this.y = num2;
+        this._x = num;
+        this._y = num2;
       }
     }
 
@@ -448,8 +448,8 @@ namespace ConsoleFramework.Core
         throw new InvalidOperationException("Rect_CannotCallMethod");
       }
 
-      this.x += offsetVector.X;
-      this.y += offsetVector.Y;
+      this._x += offsetVector.X;
+      this._y += offsetVector.Y;
     }
 
     public void Offset(int offsetX, int offsetY)
@@ -459,8 +459,8 @@ namespace ConsoleFramework.Core
         throw new InvalidOperationException("Rect_CannotCallMethod");
       }
 
-      this.x += offsetX;
-      this.y += offsetY;
+      this._x += offsetX;
+      this._y += offsetY;
     }
 
     public static Rect Offset(Rect rect, Vector offsetVector)
@@ -480,20 +480,20 @@ namespace ConsoleFramework.Core
       this.Inflate(size._width, size._height);
     }
 
-    public void Inflate(int _width, int _height)
+    public void Inflate(int width, int height)
     {
       if (this.IsEmpty)
       {
         throw new InvalidOperationException("Rect_CannotCallMethod");
       }
 
-      this.x -= _width;
-      this.y -= _height;
-      this.width += _width;
-      this.width += _width;
-      this.height += _height;
-      this.height += _height;
-      if ((this.width < 0) || (this.height < 0))
+      this._x -= width;
+      this._y -= height;
+      this._width += width;
+      this._width += width;
+      this._height += height;
+      this._height += height;
+      if ((this._width < 0) || (this._height < 0))
       {
         this = s_empty;
       }
@@ -511,23 +511,24 @@ namespace ConsoleFramework.Core
       return rect;
     }
 
-
-    private bool ContainsInternal(int _x, int _y)
+    private bool ContainsInternal(int x, int y)
     {
       // исправлено нестрогое условие на строгое
       // чтобы в rect(1;1;1;1) попадал только 1 пиксель (1;1) а не 4 пикселя (1;1)-(2;2)
-      return ((((_x >= this.x) && ((_x - this.width) < this.x)) && (_y >= this.y)) && ((_y - this.height) < this.y));
-      //return ((((_x >= this.X) && ((_x - this.width) <= this.X)) && (_y >= this.Y)) && ((_y - this.height) <= this.Y));
+      return x >= _x && 
+             x - _width < _x && 
+             y >= _y && 
+             y - _height < _y;
     }
 
     private static Rect CreateEmptyRect()
     {
       Rect rect = new Rect
       {
-        x = 0,
-        y = 0,
-        width = 0,
-        height = 0
+        _x = 0,
+        _y = 0,
+        _width = 0,
+        _height = 0
       };
       return rect;
     }
