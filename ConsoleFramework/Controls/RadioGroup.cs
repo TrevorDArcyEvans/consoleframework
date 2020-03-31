@@ -5,6 +5,7 @@ namespace ConsoleFramework.Controls
   public class RadioGroup : Panel
   {
     private int? _selectedItemIndex;
+
     public int? SelectedItemIndex
     {
       get { return _selectedItemIndex; }
