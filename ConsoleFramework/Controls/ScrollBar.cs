@@ -18,6 +18,7 @@ namespace ConsoleFramework.Controls
         typeof(ScrollBarValueChangedEventHandler), typeof(ScrollBar));
 
     private Orientation _orientation = Orientation.Horizontal;
+
     public Orientation Orientation
     {
       get => _orientation;
@@ -32,6 +33,7 @@ namespace ConsoleFramework.Controls
     }
 
     private int _value = 0;
+
     public int Value
     {
       get => _value;
@@ -46,6 +48,7 @@ namespace ConsoleFramework.Controls
     }
 
     private int _maxValue = 100;
+
     public int MaxValue
     {
       get => _maxValue;
@@ -84,7 +87,7 @@ namespace ConsoleFramework.Controls
 
     private void RenderHorizontal(RenderingBuffer buffer)
     {
-      Attr attr = Colors.Blend(Color.DarkCyan, Color.DarkBlue);
+      var attr = Colors.Blend(Color.DarkCyan, Color.DarkBlue);
       if (ActualWidth >= 1)
       {
         buffer.FillRectangle(0, 0, 1, ActualHeight, UnicodeTable.ArrowLeft, attr); // ◄
@@ -104,7 +107,7 @@ namespace ConsoleFramework.Controls
 
     private void RenderVertical(RenderingBuffer buffer)
     {
-      Attr attr = Colors.Blend(Color.DarkCyan, Color.DarkBlue);
+      var attr = Colors.Blend(Color.DarkCyan, Color.DarkBlue);
       if (ActualHeight >= 1)
       {
         buffer.FillRectangle(0, 0, ActualWidth, 1, UnicodeTable.ArrowUp, attr); // ▲
