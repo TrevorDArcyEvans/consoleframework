@@ -22,12 +22,14 @@ namespace Xaml
     /// <summary>
     /// String reference to ID of object to be used.
     /// </summary>
-    public String Ref { get; set; }
+    public string Ref { get; set; }
 
     public object ProvideValue(IMarkupExtensionContext context)
     {
       if (string.IsNullOrEmpty(Ref))
-      {throw new InvalidOperationException("Ref is null or empty string.");}
+      {
+        throw new InvalidOperationException("Ref is null or empty string.");
+      }
 
       var obj = context.GetObjectById(Ref);
       if (null == obj)
