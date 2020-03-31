@@ -14,7 +14,6 @@ namespace ConsoleFramework.Events
     public KeyboardFocusChangedEventArgs(object source, RoutedEvent routedEvent, Control oldFocus, Control newFocus) :
       base(source, routedEvent)
     {
-      //
       OldFocus = oldFocus;
       NewFocus = newFocus;
     }
