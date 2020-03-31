@@ -93,7 +93,7 @@ namespace ConsoleFramework.Native
     public const Int32 EINTR = 4;
 
     /// <summary>
-    /// Returns actual terminal _width and _height.
+    /// Returns actual terminal width and height.
     /// </summary>
     /// <param name="isDarwin">True if application is executed under Mac OS X.</param>
     /// <returns></returns>

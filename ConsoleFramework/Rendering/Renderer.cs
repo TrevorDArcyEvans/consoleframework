@@ -10,46 +10,39 @@ namespace ConsoleFramework.Rendering
   /// </summary>
   public sealed partial class Renderer
   {
-    private Rect _rootElementRect;
+    private Rect rootElementRect;
 
     /// <summary>
     /// Прямоугольная область относительно экрана консоли, в которой будет размещён Root Element.
     /// </summary>
     public Rect RootElementRect
     {
-      get { return _rootElementRect; }
+      get { return rootElementRect; }
       set
       {
-        if (_rootElementRect != value)
+        if (rootElementRect != value)
         {
-          _rootElementRect = value;
+          rootElementRect = value;
           if (null != RootElement)
-          {
             AddControlToInvalidationQueue(RootElement);
-          }
         }
       }
     }
 
-    private Control _rootElement;
+    private Control rootElement;
 
     public Control RootElement
     {
-      get { return _rootElement; }
+      get { return rootElement; }
       set
       {
-        if (_rootElement != value)
+        if (rootElement != value)
         {
-          if (_rootElement != null)
-          {
-            _rootElement.ControlUnsetAsRootElement();
-          }
-
-          _rootElement = value;
-          if (_rootElement != null)
-          {
-            _rootElement.ControlSetAsRootElement();
-          }
+          if (rootElement != null)
+            rootElement.ControlUnsetAsRootElement();
+          rootElement = value;
+          if (rootElement != null)
+            rootElement.ControlSetAsRootElement();
         }
       }
     }
@@ -57,30 +50,30 @@ namespace ConsoleFramework.Rendering
     public PhysicalCanvas Canvas { get; set; }
 
     // Buffers containing only control rendering representation itself
-    private readonly Dictionary<Control, RenderingBuffer> _buffers = new Dictionary<Control, RenderingBuffer>();
+    private readonly Dictionary<Control, RenderingBuffer> buffers = new Dictionary<Control, RenderingBuffer>();
 
     // Buffers containing full control render (with children render applied)
-    private readonly Dictionary<Control, RenderingBuffer> _fullBuffers = new Dictionary<Control, RenderingBuffer>();
+    private readonly Dictionary<Control, RenderingBuffer> fullBuffers = new Dictionary<Control, RenderingBuffer>();
 
     // Queue of controls marked for layout invalidation
-    private readonly List<Control> _invalidatedControls = new List<Control>();
+    private readonly List<Control> invalidatedControls = new List<Control>();
 
     /// <summary>
     /// Контролы, в дочерних элементах которого были изменения в порядке Z-Order
     /// (только Z-Order, если были добавлены или удалены дочерние - то он автоматически
     /// будет invalidated, и в этот список добавлять уже не нужно).
     /// </summary>
-    private readonly List<Control> _zOrderCheckControls = new List<Control>();
+    private readonly List<Control> zOrderCheckControls = new List<Control>();
 
     public bool AnyControlInvalidated
     {
-      get { return _invalidatedControls.Count != 0; }
+      get { return invalidatedControls.Count != 0; }
     }
 
     // список контролов, у которых обновилось содержимое full render buffer
     // актуален только при вызовах UpdateLayout, после вызова FinallyApplyChangesToCanvas
     // очищается
-    private readonly List<Control> _renderingUpdatedControls = new List<Control>();
+    private readonly List<Control> renderingUpdatedControls = new List<Control>();
 
     private enum AffectType
     {
@@ -94,25 +87,25 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public void FinallyApplyChangesToCanvas(bool forceRepaintAll = false)
     {
-      var affectedRect = Rect.Empty;
+      Rect affectedRect = Rect.Empty;
 
       // Propagate updated rendered buffers to parent elements and eventually to Canvas
-      foreach (var control in _renderingUpdatedControls)
+      foreach (Control control in renderingUpdatedControls)
       {
-        var currentAffectedRect = ApplyChangesToCanvas(control, new Rect(new Point(0, 0), control.RenderSize));
+        Rect currentAffectedRect = applyChangesToCanvas(control, new Rect(new Point(0, 0), control.RenderSize));
         affectedRect.Union(currentAffectedRect);
       }
 
       if (forceRepaintAll)
       {
-        affectedRect = new Rect(_rootElementRect.Size);
+        affectedRect = new Rect(rootElementRect.Size);
       }
 
       // Flush stored image (with this.RootElementRect offset)
       if (!affectedRect.IsEmpty)
       {
         // Affected rect relative to canvas
-        var affectedRectAbsolute = new Rect(affectedRect._x + RootElementRect._x, affectedRect._y + RootElementRect._y, affectedRect._width, affectedRect._height);
+        Rect affectedRectAbsolute = new Rect(affectedRect.x + RootElementRect.x, affectedRect.y + RootElementRect.y, affectedRect.width, affectedRect.height);
 
         // Clip according to real canvas size
         affectedRectAbsolute.Intersect(new Rect(new Point(0, 0), Canvas.Size));
@@ -121,13 +114,13 @@ namespace ConsoleFramework.Rendering
       }
 
       // If anything changed in layout - update displaying cursor state
-      if (_renderingUpdatedControls.Count > 0)
+      if (renderingUpdatedControls.Count > 0)
       {
         ConsoleApplication.Instance.FocusManager.RefreshMouseCursor();
       }
 
       // Prepare for next layout pass
-      _renderingUpdatedControls.Clear();
+      renderingUpdatedControls.Clear();
     }
 
     /// <summary>
@@ -138,22 +131,18 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public void UpdateLayout()
     {
-      var affectedControls = new List<ControlAffectInfo>();
+      List<ControlAffectInfo> affectedControls = new List<ControlAffectInfo>();
 
       // Invalidate layout and fill renderingUpdatedControls list
       InvalidateLayout(affectedControls);
 
       // Raise all invalidated and revalidated events of affected controls with subscribers
-      foreach (var affectInfo in affectedControls)
+      foreach (ControlAffectInfo affectInfo in affectedControls)
       {
         if (affectInfo.affectType == AffectType.LayoutInvalidated)
-        {
           affectInfo.control.RaiseInvalidatedEvent();
-        }
         else if (affectInfo.affectType == AffectType.LayoutRevalidated)
-        {
           affectInfo.control.RaiseRevalidatedEvent();
-        }
       }
 
       // Перебираем zOrderCheckControls, для каждого контрола проверяя все его дочерние -
@@ -161,13 +150,13 @@ namespace ConsoleFramework.Rendering
       // бОльшая часть дочернего контрола стала видима - добавить этот контрол в список
       // renderingUpdatedControls. Их содержимое после этого в методе FinallyApplyChangesToCanvas
       // будет выведено на экран.
-      foreach (var zorderCheckControl in _zOrderCheckControls)
+      foreach (Control zorderCheckControl in zOrderCheckControls)
       {
-        RefreshChildrenLastOverlappedRects(zorderCheckControl, true);
+        refreshChildrenLastOverlappedRects(zorderCheckControl, true);
       }
 
       // Clear list to prepare for next layout pass
-      _zOrderCheckControls.Clear();
+      zOrderCheckControls.Clear();
     }
 
     /// <summary>
@@ -176,9 +165,10 @@ namespace ConsoleFramework.Rendering
     /// то те дочерние элементы, у которых OverlappedRect уменьшился по сравнению с предыдущим
     /// значением, будут добавлены в список renderingUpdatedControls.
     /// </summary>
-    private void RefreshChildrenLastOverlappedRects(Control parent, bool addToInvalidatedIfChanged)
+    private void refreshChildrenLastOverlappedRects(Control parent,
+      bool addToInvalidatedIfChanged)
     {
-      for (var i = 0; i < parent.Children.Count; i++)
+      for (int i = 0; i < parent.Children.Count; i++)
       {
         Control control = parent.Children[i];
         // Относительно parent
@@ -187,14 +177,14 @@ namespace ConsoleFramework.Rendering
         Rect overlappedRect = Rect.Empty;
 
         // Проверяем только тех соседей, у которых Z-Order выше
-        for (var j = i + 1; j < parent.Children.Count; j++)
+        for (int j = i + 1; j < parent.Children.Count; j++)
         {
-          var sibling = parent.Children[j];
+          Control sibling = parent.Children[j];
           if (sibling != control)
           {
             if (controlRect.IntersectsWith(sibling.RenderSlotRect))
             {
-              var controlRectCopy = controlRect;
+              Rect controlRectCopy = controlRect;
               controlRectCopy.Intersect(sibling.RenderSlotRect);
               if (!controlRectCopy.IsEmpty)
               {
@@ -207,13 +197,13 @@ namespace ConsoleFramework.Rendering
 
         if (addToInvalidatedIfChanged)
         {
-          var lastOverlappedRectCopy = control.LastOverlappedRect;
+          Rect lastOverlappedRectCopy = control.LastOverlappedRect;
           lastOverlappedRectCopy.Union(overlappedRect);
 
           // Only add to invalidated if new rect is not inside old
           if (lastOverlappedRectCopy != overlappedRect)
           {
-            _renderingUpdatedControls.Add(control);
+            renderingUpdatedControls.Add(control);
           }
         }
 
@@ -230,17 +220,17 @@ namespace ConsoleFramework.Rendering
     /// Первый вызов производится с affectedRect = control.RenderSize.
     /// </summary>
     /// <returns>Affected rectangle in canvas should be copyied to console screen.</returns>
-    private Rect ApplyChangesToCanvas(Control control, Rect affectedRect)
+    private Rect applyChangesToCanvas(Control control, Rect affectedRect)
     {
       // если системой лайаута были определены размеры дочернего контрола, превышающие размеры слота
       // (такое может произойти, если дочерний контрол игнорирует переданные аргументы в MeasureOverride
       // и ArrangeOverride), то в этом месте может прийти affectedRect, выходящий за рамки
       // текущего RenderSize контрола, и мы должны выполнить intersection для корректного наложения
       affectedRect.Intersect(new Rect(new Point(0, 0), control.RenderSize));
-      var fullBuffer = GetOrCreateFullBufferForControl(control);
+      RenderingBuffer fullBuffer = GetOrCreateFullBufferForControl(control);
       if (control.Parent != null)
       {
-        var fullParentBuffer = GetOrCreateFullBufferForControl(control.Parent);
+        RenderingBuffer fullParentBuffer = GetOrCreateFullBufferForControl(control.Parent);
         // если буфер контрола содержит opacity пиксели в affectedRect, то мы вынуждены переинициализировать
         // буфер парента целиком (не вызывая Render, конечно, но переналожением буферов дочерних элементов)
         if (fullBuffer.ContainsOpacity(affectedRect))
@@ -251,7 +241,7 @@ namespace ConsoleFramework.Rendering
           {
             if (child.Visibility == Visibility.Visible)
             {
-              var childBuffer = GetOrCreateFullBufferForControl(child);
+              RenderingBuffer childBuffer = GetOrCreateFullBufferForControl(child);
               fullParentBuffer.ApplyChild(childBuffer, child.ActualOffset,
                 child.RenderSize, child.RenderSlotRect, child.LayoutClip);
             }
@@ -274,39 +264,37 @@ namespace ConsoleFramework.Rendering
         }
 
         // определим соседей контрола, которые могут перекрывать его
-        var neighbors = control.Parent.GetChildrenOrderedByZIndex();
+        IList<Control> neighbors = control.Parent.GetChildrenOrderedByZIndex();
 
         // восстанавливаем изображение поверх обновленного контрола, если
         // имеются контролы, лежащие выше по z-order
-        var controlIndex = neighbors.IndexOf(control);
+        int controlIndex = neighbors.IndexOf(control);
         // начиная с controlIndex + 1 в списке лежат контролы с z-index больше чем z-index текущего контрола
-        for (var i = controlIndex + 1; i < neighbors.Count; i++)
+        for (int i = controlIndex + 1; i < neighbors.Count; i++)
         {
-          var neighbor = neighbors[i];
+          Control neighbor = neighbors[i];
           fullParentBuffer.ApplyChild(GetOrCreateFullBufferForControl(neighbor),
             neighbor.ActualOffset, neighbor.RenderSize,
             neighbor.RenderSlotRect, neighbor.LayoutClip);
         }
 
         Rect parentAffectedRect = control.RenderSlotRect;
-        parentAffectedRect.Intersect(new Rect(affectedRect._x + control.ActualOffset._x,
-          affectedRect._y + control.ActualOffset._y,
-          affectedRect._width,
-          affectedRect._height));
+        parentAffectedRect.Intersect(new Rect(affectedRect.x + control.ActualOffset._x,
+          affectedRect.y + control.ActualOffset._y,
+          affectedRect.width,
+          affectedRect.height));
         // нет смысла продолжать подъем вверх по дереву, если контрола точно уже не видно
         if (parentAffectedRect.IsEmpty)
         {
           return Rect.Empty;
         }
 
-        return ApplyChangesToCanvas(control.Parent, parentAffectedRect);
+        return applyChangesToCanvas(control.Parent, parentAffectedRect);
       }
       else
       {
         if (control != RootElement)
-        {
           throw new InvalidOperationException("Assertion failed.");
-        }
 
         // мы добрались до экрана консоли
         fullBuffer.CopyToPhysicalCanvas(Canvas, affectedRect, RootElementRect.TopLeft);
@@ -324,19 +312,19 @@ namespace ConsoleFramework.Rendering
     /// <param name="affectedControls"></param>
     private void InvalidateLayout(List<ControlAffectInfo> affectedControls)
     {
-      var resettedControls = new List<Control>();
-      var revalidatedControls = new List<Control>();
-      while (_invalidatedControls.Count != 0)
+      List<Control> resettedControls = new List<Control>();
+      List<Control> revalidatedControls = new List<Control>();
+      while (invalidatedControls.Count != 0)
       {
         // Dequeue next control
-        var control = _invalidatedControls[_invalidatedControls.Count - 1];
-        _invalidatedControls.RemoveAt(_invalidatedControls.Count - 1);
+        Control control = invalidatedControls[invalidatedControls.Count - 1];
+        invalidatedControls.RemoveAt(invalidatedControls.Count - 1);
 
         // Set previous results of layout passes dirty
         control.ResetValidity(resettedControls);
         if (resettedControls.Count > 0)
         {
-          foreach (var resettedControl in resettedControls)
+          foreach (Control resettedControl in resettedControls)
           {
             affectedControls.Add(new ControlAffectInfo(resettedControl, AffectType.LayoutInvalidated));
           }
@@ -344,10 +332,11 @@ namespace ConsoleFramework.Rendering
           resettedControls.Clear();
         }
 
+        //
         UpdateLayout(control, revalidatedControls);
         if (revalidatedControls.Count > 0)
         {
-          foreach (var revalidatedControl in revalidatedControls)
+          foreach (Control revalidatedControl in revalidatedControls)
           {
             affectedControls.Add(new ControlAffectInfo(revalidatedControl, AffectType.LayoutRevalidated));
           }
@@ -357,14 +346,14 @@ namespace ConsoleFramework.Rendering
       }
     }
 
-    private static bool CheckDesiredSizeNotChangedRecursively(Control control)
+    private bool CheckDesiredSizeNotChangedRecursively(Control control)
     {
       if (control.LastLayoutInfo.unclippedDesiredSize != control.LayoutInfo.unclippedDesiredSize)
       {
         return false;
       }
 
-      foreach (var child in control.Children)
+      foreach (Control child in control.Children)
       {
         if (!CheckDesiredSizeNotChangedRecursively(child))
           return false;
@@ -387,6 +376,7 @@ namespace ConsoleFramework.Rendering
         if (lastLayoutInfo.validity != LayoutValidity.Nothing)
         {
           control.Measure(lastLayoutInfo.measureArgument);
+//                    if (lastLayoutInfo.unclippedDesiredSize == control.layoutInfo.unclippedDesiredSize) {
           if (CheckDesiredSizeNotChangedRecursively(control))
           {
             needUpdateParentLayout = false;
@@ -436,25 +426,22 @@ namespace ConsoleFramework.Rendering
       {
         buffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
         fullBuffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
-        _buffers[control] = buffer;
-        _fullBuffers[control] = fullBuffer;
+        buffers[control] = buffer;
+        fullBuffers[control] = fullBuffer;
       }
 
       buffer.Clear();
       if (control.RenderSize.Width != 0 && control.RenderSize.Height != 0)
-      {
         control.Render(buffer);
-      }
-
       // проверяем дочерние контролы - если их layoutInfo не изменился по сравнению с последним,
       // то мы можем взять их последний renderBuffer без обновления и применить к текущему контролу
       fullBuffer.CopyFrom(buffer);
-      var children = control.Children;
-      foreach (var child in children)
+      IList<Control> children = control.Children;
+      foreach (Control child in children)
       {
         if (child.Visibility == Visibility.Visible)
         {
-          var fullChildBuffer = ProcessControl(child, revalidatedControls);
+          RenderingBuffer fullChildBuffer = ProcessControl(child, revalidatedControls);
           fullBuffer.ApplyChild(fullChildBuffer, child.ActualOffset,
             child.RenderSize,
             child.RenderSlotRect, child.LayoutClip);
@@ -470,7 +457,7 @@ namespace ConsoleFramework.Rendering
       }
 
       // Save overlappingRect for each control child
-      RefreshChildrenLastOverlappedRects(control, false);
+      refreshChildrenLastOverlappedRects(control, false);
 
       if (control.SetValidityToRender())
       {
@@ -485,14 +472,14 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     private void AddControlToRenderingUpdatedList(Control control)
     {
-      _renderingUpdatedControls.Add(control);
+      renderingUpdatedControls.Add(control);
     }
 
-    private static bool CheckRenderingWasNotChangedRecursively(Control control)
+    private bool CheckRenderingWasNotChangedRecursively(Control control)
     {
       if (!control.LastLayoutInfo.Equals(control.LayoutInfo)
           || control.LastLayoutInfo.validity != LayoutValidity.Render) return false;
-      foreach (var child in control.Children)
+      foreach (Control child in control.Children)
       {
         if (!CheckRenderingWasNotChangedRecursively(child)) return false;
       }
@@ -502,12 +489,12 @@ namespace ConsoleFramework.Rendering
 
     private RenderingBuffer ProcessControl(Control control, List<Control> revalidatedControls)
     {
-      var buffer = GetOrCreateBufferForControl(control);
-      var fullBuffer = GetOrCreateFullBufferForControl(control);
-
-      var lastLayoutInfo = control.LastLayoutInfo;
-      var layoutInfo = control.LayoutInfo;
-
+      RenderingBuffer buffer = GetOrCreateBufferForControl(control);
+      RenderingBuffer fullBuffer = GetOrCreateFullBufferForControl(control);
+      //
+      LayoutInfo lastLayoutInfo = control.LastLayoutInfo;
+      LayoutInfo layoutInfo = control.LayoutInfo;
+      //
       control.Measure(lastLayoutInfo.measureArgument);
       control.Arrange(lastLayoutInfo.renderSlotRect);
       // if lastLayoutInfo eq layoutInfo we can use last rendered buffer
@@ -526,24 +513,23 @@ namespace ConsoleFramework.Rendering
       {
         buffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
         fullBuffer = new RenderingBuffer(layoutInfo.renderSize._width, layoutInfo.renderSize._height);
-        _buffers[control] = buffer;
-        _fullBuffers[control] = fullBuffer;
+        buffers[control] = buffer;
+        fullBuffers[control] = fullBuffer;
       }
 
       // otherwise we should assemble full rendered buffer using childs
       buffer.Clear();
       if (control.RenderSize.Width != 0 && control.RenderSize.Height != 0)
-      {
         control.Render(buffer);
-      }
-
+      //
       fullBuffer.CopyFrom(buffer);
-      foreach (var child in control.Children)
+      foreach (Control child in control.Children)
       {
         if (child.Visibility == Visibility.Visible)
         {
-          var fullChildBuffer = ProcessControl(child, revalidatedControls);
-          fullBuffer.ApplyChild(fullChildBuffer, child.ActualOffset, child.RenderSize, child.RenderSlotRect, child.LayoutClip);
+          RenderingBuffer fullChildBuffer = ProcessControl(child, revalidatedControls);
+          fullBuffer.ApplyChild(fullChildBuffer, child.ActualOffset,
+            child.RenderSize, child.RenderSlotRect, child.LayoutClip);
         }
         else
         {
@@ -557,7 +543,7 @@ namespace ConsoleFramework.Rendering
       }
 
       // Save overlappingRect for each control child
-      RefreshChildrenLastOverlappedRects(control, false);
+      refreshChildrenLastOverlappedRects(control, false);
 
       if (control.SetValidityToRender())
       {
@@ -569,17 +555,13 @@ namespace ConsoleFramework.Rendering
 
     internal void AddControlToInvalidationQueue(Control control)
     {
-      if (null == control)
-      {
-        throw new ArgumentNullException("control");
-      }
-
-      if (!_invalidatedControls.Contains(control))
+      if (null == control) throw new ArgumentNullException("control");
+      if (!invalidatedControls.Contains(control))
       {
         // Add to queue only if it has parent or it is root element
         if (control.Parent != null || control == RootElement)
         {
-          _invalidatedControls.Add(control);
+          invalidatedControls.Add(control);
         }
       }
     }
@@ -587,14 +569,14 @@ namespace ConsoleFramework.Rendering
     private RenderingBuffer GetOrCreateBufferForControl(Control control)
     {
       RenderingBuffer value;
-      if (_buffers.TryGetValue(control, out value))
+      if (buffers.TryGetValue(control, out value))
       {
         return value;
       }
       else
       {
-        var buffer = new RenderingBuffer(control.ActualWidth, control.ActualHeight);
-        _buffers.Add(control, buffer);
+        RenderingBuffer buffer = new RenderingBuffer(control.ActualWidth, control.ActualHeight);
+        buffers.Add(control, buffer);
         return buffer;
       }
     }
@@ -602,14 +584,14 @@ namespace ConsoleFramework.Rendering
     private RenderingBuffer GetOrCreateFullBufferForControl(Control control)
     {
       RenderingBuffer value;
-      if (_fullBuffers.TryGetValue(control, out value))
+      if (fullBuffers.TryGetValue(control, out value))
       {
         return value;
       }
       else
       {
-        var buffer = new RenderingBuffer(control.ActualWidth, control.ActualHeight);
-        _fullBuffers.Add(control, buffer);
+        RenderingBuffer buffer = new RenderingBuffer(control.ActualWidth, control.ActualHeight);
+        fullBuffers.Add(control, buffer);
         return buffer;
       }
     }
@@ -623,12 +605,12 @@ namespace ConsoleFramework.Rendering
       // Если контрол, над которым водят мышью, имеет невидимых сыновей, которые ни разу
       // не отрисовывались, то в словаре буферов для таких сыновей ничего не окажется.
       // Возвращаем для таких детей 6 - как будто они полностью прозрачны
-      if (!_buffers.ContainsKey(control))
+      if (!buffers.ContainsKey(control))
       {
         return 6;
       }
 
-      return _buffers[control].GetOpacityAt(x, y);
+      return buffers[control].GetOpacityAt(x, y);
     }
 
     /// <summary>
@@ -637,9 +619,9 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     internal void ControlRemovedFromTree(Control child)
     {
-      if (_invalidatedControls.Contains(child))
+      if (invalidatedControls.Contains(child))
       {
-        _invalidatedControls.Remove(child);
+        invalidatedControls.Remove(child);
       }
 
       foreach (var nestedChild in child.Children)
@@ -656,7 +638,7 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     internal void AddControlToZOrderCheckList(Control control)
     {
-      _zOrderCheckControls.Add(control);
+      zOrderCheckControls.Add(control);
     }
   }
 }

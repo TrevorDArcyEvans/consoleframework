@@ -81,19 +81,19 @@ namespace ConsoleFramework.Controls {
         }
 
         /// <summary>
-        /// Will write the content of text editor to matrix constrained with _width/_height,
+        /// Will write the content of text editor to matrix constrained with width/height,
         /// starting from (left, top) coord. Coords may be negative.
         /// If there are any gap before (or after) text due to margin, window will be filled
         /// with spaces there.
-        /// Window size should be equal to _width/_height passed.
+        /// Window size should be equal to width/height passed.
         /// </summary>
         public void WriteToWindow(int left, int top, int width, int height, char[,] window) {
             if (window.GetLength(0) != height) {
-                throw new ArgumentException("window _height differs from viewport _height");
+                throw new ArgumentException("window height differs from viewport height");
             }
 
             if (window.GetLength(1) != width) {
-                throw new ArgumentException("window _width differs from viewport _width");
+                throw new ArgumentException("window width differs from viewport width");
             }
 
             for (int y = top; y < 0; y++) {

@@ -607,7 +607,7 @@ namespace ConsoleFramework.Controls
     {
       if (availableSize.Width < 0 || availableSize.Height < 0)
       {
-        throw new ArgumentException("Negative _width/_height is not allowed");
+        throw new ArgumentException("Negative width/height is not allowed");
       }
 
       if (LayoutInfo.validity != LayoutValidity.Nothing)
@@ -698,7 +698,7 @@ namespace ConsoleFramework.Controls
 
       if (DesiredSize.Width == int.MaxValue || DesiredSize.Height == int.MaxValue)
       {
-        throw new Exception("Desired size cannot have int.MaxValue _width/_height");
+        throw new Exception("Desired size cannot have int.MaxValue width/height");
       }
     }
 
@@ -721,7 +721,7 @@ namespace ConsoleFramework.Controls
     /// будет, и в контексте родительского контрола его рендеринг будет обрезан.
     /// </para>
     /// <para>
-    /// Нельзя возвращать int.MaxValue в качестве _width или _height возвращаемого размера.
+    /// Нельзя возвращать int.MaxValue в качестве width или height возвращаемого размера.
     /// </para>
     /// <para>
     /// При реализации панелей необходимо в обязательном порядке вызвать Measure для всех дочерних

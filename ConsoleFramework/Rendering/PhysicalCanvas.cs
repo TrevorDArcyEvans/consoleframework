@@ -12,7 +12,7 @@ namespace ConsoleFramework.Rendering
   /// </summary>
   public partial class PhysicalCanvas
   {
-    private readonly IntPtr _stdOutputHandle = IntPtr.Zero;
+    private readonly IntPtr stdOutputHandle = IntPtr.Zero;
 
     public PhysicalCanvas(int width, int height)
     {
@@ -23,19 +23,19 @@ namespace ConsoleFramework.Rendering
     public PhysicalCanvas(int width, int height, IntPtr stdOutputHandle)
     {
       this._size = new Size(width, height);
-      this._stdOutputHandle = stdOutputHandle;
+      this.stdOutputHandle = stdOutputHandle;
       this._buffer = new CHAR_INFO[height, width];
     }
 
     /// <summary>
     /// Buffer to marshal between application and Win32 API layer.
     /// </summary>
-    private CHAR_INFO[,] _buffer;
+    protected CHAR_INFO[,] _buffer;
 
     /// <summary>
     /// Indexers cache to avoid objects creation on every [][] call.
     /// </summary>
-    private readonly Dictionary<int, NestedIndexer> _cachedIndexers = new Dictionary<int, NestedIndexer>();
+    private readonly Dictionary<int, NestedIndexer> cachedIndexers = new Dictionary<int, NestedIndexer>();
 
     private Size _size;
 
@@ -46,7 +46,7 @@ namespace ConsoleFramework.Rendering
       {
         if (value != _size)
         {
-          var oldBuffer = _buffer;
+          CHAR_INFO[,] oldBuffer = _buffer;
           _buffer = new CHAR_INFO[value.Height, value.Width];
           for (int x = 0, w = Math.Min(_size.Width, value.Width); x < w; x++)
           {
@@ -67,16 +67,16 @@ namespace ConsoleFramework.Rendering
       {
         if (index < 0 || index >= _size._width)
         {
-          throw new IndexOutOfRangeException("index exceeds specified buffer _width.");
+          throw new IndexOutOfRangeException("index exceeds specified buffer width.");
         }
 
-        if (_cachedIndexers.ContainsKey(index))
+        if (cachedIndexers.ContainsKey(index))
         {
-          return _cachedIndexers[index];
+          return cachedIndexers[index];
         }
 
         NestedIndexer res = new NestedIndexer(index, this);
-        _cachedIndexers[index] = res;
+        cachedIndexers[index] = res;
         return res;
       }
     }
@@ -94,13 +94,13 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public virtual void Flush(Rect affectedRect)
     {
-      if (_stdOutputHandle != IntPtr.Zero)
+      if (stdOutputHandle != IntPtr.Zero)
       {
         // we are in windows environment
-        SMALL_RECT rect = new SMALL_RECT((short) affectedRect._x, (short) affectedRect._y,
-          (short) (affectedRect._width + affectedRect._x), (short) (affectedRect._height + affectedRect._y));
-        if (!Win32.WriteConsoleOutputCore(_stdOutputHandle, _buffer, new COORD((short) _size.Width, (short) _size.Height),
-          new COORD((short) affectedRect._x, (short) affectedRect._y), ref rect))
+        SMALL_RECT rect = new SMALL_RECT((short) affectedRect.x, (short) affectedRect.y,
+          (short) (affectedRect.width + affectedRect.x), (short) (affectedRect.height + affectedRect.y));
+        if (!Win32.WriteConsoleOutputCore(stdOutputHandle, _buffer, new COORD((short) _size.Width, (short) _size.Height),
+          new COORD((short) affectedRect.x, (short) affectedRect.y), ref rect))
         {
           throw new InvalidOperationException(string.Format("Cannot write to console : {0}", Win32.GetLastErrorMessage()));
         }
@@ -108,27 +108,29 @@ namespace ConsoleFramework.Rendering
       else
       {
         // we are in linux
-        for (var i = 0; i < affectedRect._width; i++)
+        for (int i = 0; i < affectedRect.width; i++)
         {
-          var x = i + affectedRect._x;
-          for (var j = 0; j < affectedRect._height; j++)
+          int x = i + affectedRect.x;
+          for (int j = 0; j < affectedRect.height; j++)
           {
-            var y = j + affectedRect._y;
+            int y = j + affectedRect.y;
             // todo : convert attributes and optimize rendering
             bool fgIntensity;
             short index = NCurses.winAttrsToNCursesAttrs(_buffer[y, x].Attributes,
               out fgIntensity);
             if (fgIntensity)
             {
-              NCurses.attrset((int) (NCurses.COLOR_PAIR(index) | NCurses.A_BOLD));
+              NCurses.attrset(
+                (int) (NCurses.COLOR_PAIR(index) | NCurses.A_BOLD));
             }
             else
             {
-              NCurses.attrset((int) NCurses.COLOR_PAIR(index));
+              NCurses.attrset(
+                (int) NCurses.COLOR_PAIR(index));
             }
 
             // TODO : optimize this
-            var outChar = _buffer[y, x].UnicodeChar != '\0' ? (_buffer[y, x].UnicodeChar) : ' ';
+            char outChar = _buffer[y, x].UnicodeChar != '\0' ? (_buffer[y, x].UnicodeChar) : ' ';
             var bytes = UTF8Encoding.UTF8.GetBytes(new char[] { outChar });
             NCurses.mvaddstr(y, x, bytes);
           }
