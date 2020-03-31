@@ -1,6 +1,7 @@
 namespace ConsoleFramework.Controls
 {
-  internal enum LayoutValidity {
+  internal enum LayoutValidity
+  {
     Nothing = 1,
     MeasureAndArrange = 2,
     Render = 3
