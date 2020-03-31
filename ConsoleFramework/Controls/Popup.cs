@@ -37,8 +37,10 @@ namespace ConsoleFramework.Controls
     {
       this._parentItemWidth = parentItemWidth;
       this._shadow = shadow;
-      _panel = new Panel();
-      _panel.Orientation = Orientation.Vertical;
+      _panel = new Panel
+      {
+        Orientation = Orientation.Vertical
+      };
       foreach (var item in menuItems)
       {
         _panel.Children.Add(item);
