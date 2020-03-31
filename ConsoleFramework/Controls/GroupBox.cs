@@ -69,14 +69,14 @@ namespace ConsoleFramework.Controls
 
     protected override Size MeasureOverride(Size availableSize)
     {
-      Size contentSize = Size.Empty;
+      var contentSize = Size.Empty;
       if (_content != null)
       {
         _content.Measure(new Size(int.MaxValue, int.MaxValue));
         contentSize = _content.DesiredSize;
       }
 
-      Size needSize = new Size(
+      var needSize = new Size(
         Math.Max(contentSize.Width + 2, (_title ?? string.Empty).Length + 4),
         contentSize.Height + 2
       );
@@ -85,7 +85,7 @@ namespace ConsoleFramework.Controls
         return needSize;
       }
 
-      Size constrainedSize = new Size(
+      var constrainedSize = new Size(
         Math.Min(needSize.Width, availableSize.Width),
         Math.Min(needSize.Height, availableSize.Height)
       );
@@ -111,7 +111,7 @@ namespace ConsoleFramework.Controls
         return finalSize;
       }
 
-      Rect contentRect = new Rect(1, 1,
+      var contentRect = new Rect(1, 1,
         Math.Max(0, finalSize.Width - 2),
         Math.Max(0, finalSize.Height - 2));
       _content.Arrange(contentRect);
