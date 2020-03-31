@@ -8,19 +8,21 @@ namespace ConsoleFramework.Controls
 
   public class MessageBox : Window
   {
-    private readonly TextBlock _textBlock;
-
     public MessageBox()
     {
-      Panel panel = new Panel();
-      _textBlock = new TextBlock();
-      _textBlock.HorizontalAlignment = HorizontalAlignment.Center;
-      _textBlock.VerticalAlignment = VerticalAlignment.Center;
-      _textBlock.Margin = new Thickness(1);
-      Button button = new Button();
-      button.Margin = new Thickness(4, 0, 4, 0);
-      button.HorizontalAlignment = HorizontalAlignment.Center;
-      button.Caption = "OK";
+      var panel = new Panel();
+      _textBlock = new TextBlock
+      {
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center,
+        Margin = new Thickness(1)
+      };
+      Button button = new Button
+      {
+        Margin = new Thickness(4, 0, 4, 0),
+        HorizontalAlignment = HorizontalAlignment.Center,
+        Caption = "OK"
+      };
       button.OnClick += CloseButtonOnClicked;
       panel.Children.Add(_textBlock);
       panel.Children.Add(button);
@@ -33,6 +35,8 @@ namespace ConsoleFramework.Controls
     {
       Close();
     }
+
+    private readonly TextBlock _textBlock;
 
     public string Text
     {
@@ -47,6 +51,7 @@ namespace ConsoleFramework.Controls
       {
         throw new InvalidOperationException("Default windows host not found, create MessageBox manually");
       }
+
       var windowsHost = (WindowsHost) rootControl;
       var messageBox = new MessageBox();
       messageBox.Title = title;
