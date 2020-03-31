@@ -22,7 +22,7 @@ namespace ConsoleFramework.Controls
       this._shadow = shadow;
       _scrollViewer = new ScrollViewer();
       _listbox = new ListBox();
-      foreach (string item in items)
+      foreach (var item in items)
       {
         _listbox.Items.Add(item);
       }
@@ -106,7 +106,7 @@ namespace ConsoleFramework.Controls
 
     public override void Render(RenderingBuffer buffer)
     {
-      Attr borderAttrs = Colors.Blend(Color.Black, Color.DarkCyan);
+      var borderAttrs = Colors.Blend(Color.Black, Color.DarkCyan);
 
       // Background
       buffer.FillRectangle(1, 1, this.ActualWidth - 1, this.ActualHeight - 1, ' ', borderAttrs);
@@ -132,6 +132,7 @@ namespace ConsoleFramework.Controls
       {
         return new Size(0, 0);
       }
+
       if (_shadow)
       {
         // 1 row and 1 column - reserved for transparent space, remaining - for ListBox
