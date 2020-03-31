@@ -70,7 +70,7 @@ namespace ConsoleFramework.Controls
       {
         var columnDefinition = ColumnDefinitions[x];
 
-        int width = columnDefinition.Width.GridUnitType == GridUnitType.Pixel
+        var width = columnDefinition.Width.GridUnitType == GridUnitType.Pixel
           ? columnDefinition.Width.Value
           : int.MaxValue;
 
