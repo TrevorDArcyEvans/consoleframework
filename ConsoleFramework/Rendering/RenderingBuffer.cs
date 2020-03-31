@@ -289,11 +289,11 @@ namespace ConsoleFramework.Rendering
       rectToCopy.Intersect(canvasRect);
       rectToCopy.Intersect(bufferRect);
       //
-      for (int x = 0; x < rectToCopy.width; x++)
+      for (int x = 0; x < rectToCopy.Width; x++)
       {
         int bufferX = x + rectToCopy.X;
         int canvasX = x + rectToCopy.X + offset.X;
-        for (int y = 0; y < rectToCopy.height; y++)
+        for (int y = 0; y < rectToCopy.Height; y++)
         {
           int bufferY = y + rectToCopy.Y;
           int canvasY = y + rectToCopy.Y + offset.Y;
@@ -340,9 +340,9 @@ namespace ConsoleFramework.Rendering
     /// </summary>
     public bool ContainsOpacity(Rect affectedRect)
     {
-      for (int x = 0; x < affectedRect.width; x++)
+      for (int x = 0; x < affectedRect.Width; x++)
       {
-        for (int y = 0; y < affectedRect.height; y++)
+        for (int y = 0; y < affectedRect.Height; y++)
         {
           if (opacityMatrix[x + affectedRect.X, y + affectedRect.Y] != 0)
           {

@@ -98,7 +98,7 @@ namespace ConsoleFramework.Rendering
       {
         // we are in windows environment
         SMALL_RECT rect = new SMALL_RECT((short) affectedRect.X, (short) affectedRect.Y,
-          (short) (affectedRect.width + affectedRect.X), (short) (affectedRect.height + affectedRect.Y));
+          (short) (affectedRect.Width + affectedRect.X), (short) (affectedRect.Height + affectedRect.Y));
         if (!Win32.WriteConsoleOutputCore(stdOutputHandle, _buffer, new COORD((short) _size.Width, (short) _size.Height),
           new COORD((short) affectedRect.X, (short) affectedRect.Y), ref rect))
         {
@@ -108,10 +108,10 @@ namespace ConsoleFramework.Rendering
       else
       {
         // we are in linux
-        for (int i = 0; i < affectedRect.width; i++)
+        for (int i = 0; i < affectedRect.Width; i++)
         {
           int x = i + affectedRect.X;
-          for (int j = 0; j < affectedRect.height; j++)
+          for (int j = 0; j < affectedRect.Height; j++)
           {
             int y = j + affectedRect.Y;
             // todo : convert attributes and optimize rendering

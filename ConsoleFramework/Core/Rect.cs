@@ -233,7 +233,7 @@ namespace ConsoleFramework.Core
       }
     }
 
-    internal int width;
+    private int width;
     public int Width
     {
       get { return this.width; }
@@ -253,7 +253,7 @@ namespace ConsoleFramework.Core
       }
     }
 
-    internal int height;
+    private int height;
     public int Height
     {
       get { return this.height; }
