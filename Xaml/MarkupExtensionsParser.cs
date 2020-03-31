@@ -6,115 +6,46 @@ using System.Text;
 
 namespace Xaml
 {
-  /// <summary>
-  /// Marker of fixup token - object can be returned from
-  /// markup extension context. Token allows to resolve forward references in XAML.
-  /// </summary>
-  public interface IFixupToken
-  {
-  }
-
-  /// <summary>
-  /// Контекст, доступный расширению разметки.
-  /// </summary>
-  public interface IMarkupExtensionContext
-  {
-    /// <summary>
-    /// Имя свойства, которое определяется при помощи расширения разметки.
-    /// </summary>
-    String PropertyName { get; }
-
-    /// <summary>
-    /// Ссылка на конфигурируемый объект.
-    /// </summary>
-    Object Object { get; }
-
-    /// <summary>
-    /// Возвращает активный для конфигурируемого объекта DataContext.
-    /// Если у текущего конфигурируемого объекта нет собственного DataContext'a,
-    /// будет взят контекст объекта выше по иерархии контролов, и так до главного элемента
-    /// дерева контролов.
-    /// </summary>
-    Object DataContext { get; }
-
-    /// <summary>
-    /// Returns already created object with specified x:Id attribute value or null if object with
-    /// this x:Id is not constructed yet. To resolve forward references use fixup tokens mechanism.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    Object GetObjectById(String id);
-
-    /// <summary>
-    /// Gets a value that determines whether calling GetFixupToken is available
-    /// in order to resolve a name into a token for forward resolution.
-    /// </summary>
-    bool IsFixupTokenAvailable { get; }
-
-    /// <summary>
-    /// Returns an object that can correct for certain markup patterns that produce forward references.
-    /// </summary>
-    /// <param name="ids">A collection of ids that are possible forward references.</param>
-    /// <returns>An object that provides a token for lookup behavior to be evaluated later.</returns>
-    IFixupToken GetFixupToken(IEnumerable<String> ids);
-  }
-
-  /// <summary>
-  /// todo : comment
-  /// </summary>
-  public interface IMarkupExtension
-  {
-    /// <summary>
-    /// If ProvideValue returns null, it will not be assigned to object property.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    Object ProvideValue(IMarkupExtensionContext context);
-  }
-
-  public interface IMarkupExtensionsResolver
-  {
-    Type Resolve(String name);
-  }
-
   public class MarkupExtensionsParser
   {
     private readonly IMarkupExtensionsResolver resolver;
 
-    public MarkupExtensionsParser(IMarkupExtensionsResolver resolver, String text)
+    public MarkupExtensionsParser(IMarkupExtensionsResolver resolver, string text)
     {
       this.resolver = resolver;
-      this.text = text;
+      this._text = text;
     }
 
-    private String text;
-    private int index;
+    private string _text;
+    private int _index;
 
-    private bool hasNextChar()
+    private bool HasNextChar()
     {
-      return index < text.Length;
+      return _index < _text.Length;
     }
 
-    private char consumeChar()
+    private char ConsumeChar()
     {
-      return text[index++];
+      return _text[_index++];
     }
 
-    private char peekNextChar()
+    private char PeekNextChar()
     {
-      return text[index];
+      return _text[_index];
     }
 
     public Object ProcessMarkupExtension(IMarkupExtensionContext context)
     {
       // interpret as markup extension expression
-      object result = processMarkupExtensionCore(context);
-      if (result is IFixupToken) return result;
-
-      if (hasNextChar())
+      var result = ProcessMarkupExtensionCore(context);
+      if (result is IFixupToken)
       {
-        throw new InvalidOperationException(
-          String.Format("Syntax error: unexpected characters at {0}", index));
+        return result;
+      }
+
+      if (HasNextChar())
+      {
+        throw new InvalidOperationException(String.Format("Syntax error: unexpected characters at {0}", _index));
       }
 
       return result;
@@ -124,17 +55,18 @@ namespace Xaml
     /// Consumes all whitespace characters. If necessary is true, at least one
     /// whitespace character should be consumed.
     /// </summary>
-    private void processWhitespace(bool necessary = true)
+    private void ProcessWhitespace(bool necessary = true)
     {
       if (necessary)
       {
         // at least one whitespace should be
-        if (peekNextChar() != ' ')
-          throw new InvalidOperationException(
-            String.Format("Syntax error: whitespace expected at {0}.", index));
+        if (PeekNextChar() != ' ')
+        {
+          throw new InvalidOperationException(String.Format("Syntax error: whitespace expected at {0}.", _index));
+        }
       }
 
-      while (peekNextChar() == ' ') consumeChar();
+      while (PeekNextChar() == ' ') ConsumeChar();
     }
 
     /// <summary>
@@ -143,67 +75,84 @@ namespace Xaml
     /// constructs and initializes it, and returns ProvideValue method result.
     /// </summary>
     /// <param name="context">Context object passed to ProvideValue method.</param>
-    private Object processMarkupExtensionCore(IMarkupExtensionContext context)
+    private Object ProcessMarkupExtensionCore(IMarkupExtensionContext context)
     {
-      if (consumeChar() != '{')
+      if (ConsumeChar() != '{')
+      {
         throw new InvalidOperationException("Syntax error: '{{' token expected at 0.");
-      processWhitespace(false);
-      String markupExtensionName = processQualifiedName();
+      }
+
+      ProcessWhitespace(false);
+      var markupExtensionName = ProcessQualifiedName();
       if (markupExtensionName.Length == 0)
+      {
         throw new InvalidOperationException("Syntax error: markup extension name is empty.");
-      processWhitespace();
+      }
 
-      Type type = resolver.Resolve(markupExtensionName);
+      ProcessWhitespace();
 
-      Object obj = null;
-      List<Object> ctorArgs = new List<object>();
+      var type = resolver.Resolve(markupExtensionName);
+
+      object obj = null;
+      var ctorArgs = new List<object>();
 
       for (;;)
       {
-        if (peekNextChar() == '{')
+        if (PeekNextChar() == '{')
         {
           // inner markup extension processing
 
           // syntax error if ctor arg defined after any property
           if (obj != null)
-            throw new InvalidOperationException("Syntax error: constructor argument" +
-                                                " cannot be after property assignment.");
+          {
+            throw new InvalidOperationException("Syntax error: constructor argument cannot be after property assignment.");
+          }
 
-          Object value = processMarkupExtensionCore(context);
+          var value = ProcessMarkupExtensionCore(context);
           if (value is IFixupToken)
+          {
             return value;
+          }
+
           ctorArgs.Add(value);
         }
         else
         {
-          String membernameOrString = processString();
+          var membernameOrString = ProcessString();
 
           if (membernameOrString.Length == 0)
-            throw new InvalidOperationException(
-              String.Format("Syntax error: member name or string expected at {0}",
-                index));
-
-          if (peekNextChar() == '=')
           {
-            consumeChar();
-            object value = peekNextChar() == '{'
-              ? processMarkupExtensionCore(context)
-              : processString();
+            throw new InvalidOperationException($"Syntax error: member name or string expected at {_index}");
+          }
 
-            if (value is IFixupToken) return value;
+          if (PeekNextChar() == '=')
+          {
+            ConsumeChar();
+            var value = PeekNextChar() == '{'
+              ? ProcessMarkupExtensionCore(context)
+              : ProcessString();
+
+            if (value is IFixupToken)
+            {
+              return value;
+            }
 
             // construct object if not constructed yet
-            if (obj == null) obj = construct(type, ctorArgs);
+            if (obj == null)
+            {
+              obj = Construct(type, ctorArgs);
+            }
 
             // assign value to specified member
-            assignProperty(type, obj, membernameOrString, value);
+            AssignProperty(type, obj, membernameOrString, value);
           }
-          else if (peekNextChar() == ',' || peekNextChar() == '}')
+          else if (PeekNextChar() == ',' || PeekNextChar() == '}')
           {
             // syntax error if ctor arg defined after any property
             if (obj != null)
-              throw new InvalidOperationException("Syntax error: constructor argument" +
-                                                  " cannot be after property assignment.");
+            {
+              throw new InvalidOperationException("Syntax error: constructor argument cannot be after property assignment.");
+            }
 
             // store membernameOrString as string argument of ctor
             ctorArgs.Add(membernameOrString);
@@ -211,23 +160,24 @@ namespace Xaml
           else
           {
             // it is '{' token, throw syntax error
-            throw new InvalidOperationException(
-              String.Format("Syntax error : unexpected '{{' token at {0}.",
-                index));
+            throw new InvalidOperationException($"Syntax error : unexpected '{{' token at {_index}.");
           }
         }
 
         // after ctor arg or property assignment should be , or }
-        if (peekNextChar() == ',')
+        if (PeekNextChar() == ',')
         {
-          consumeChar();
+          ConsumeChar();
         }
-        else if (peekNextChar() == '}')
+        else if (PeekNextChar() == '}')
         {
-          consumeChar();
+          ConsumeChar();
 
           // construct object
-          if (obj == null) obj = construct(type, ctorArgs);
+          if (obj == null)
+          {
+            obj = Construct(type, ctorArgs);
+          }
 
           // markup extension is finished
           break;
@@ -235,30 +185,28 @@ namespace Xaml
         else
         {
           // it is '{' token (without whitespace), throw syntax error
-          throw new InvalidOperationException(
-            String.Format("Syntax error : unexpected '{{' token at {0}.",
-              index));
+          throw new InvalidOperationException($"Syntax error : unexpected '{{' token at {_index}.");
         }
 
-        processWhitespace(false);
+        ProcessWhitespace(false);
       }
 
       return ((IMarkupExtension) obj).ProvideValue(context);
     }
 
-    private void assignProperty(Type type, Object obj, string propertyName, object value)
+    private static void AssignProperty(Type type, Object obj, string propertyName, object value)
     {
-      PropertyInfo property = type.GetProperty(propertyName);
+      var property = type.GetProperty(propertyName);
       property.SetValue(obj, value, null);
     }
 
     /// <summary>
     /// Constructs object of specified type using specified ctor arguments list.
     /// </summary>
-    private Object construct(Type type, List<Object> ctorArgs)
+    private static object Construct(Type type, List<Object> ctorArgs)
     {
-      ConstructorInfo[] constructors = type.GetConstructors();
-      List<ConstructorInfo> constructorInfos = constructors.Where(info => info.GetParameters().Length == ctorArgs.Count).ToList();
+      var constructors = type.GetConstructors();
+      var constructorInfos = constructors.Where(info => info.GetParameters().Length == ctorArgs.Count).ToList();
       if (constructorInfos.Count == 0)
       {
         throw new InvalidOperationException("No suitable constructor");
@@ -269,10 +217,10 @@ namespace Xaml
         throw new InvalidOperationException("Ambiguous constructor call");
       }
 
-      ConstructorInfo ctor = constructorInfos[0];
-      ParameterInfo[] parameters = ctor.GetParameters();
-      Object[] convertedArgs = new object[ctorArgs.Count];
-      for (int i = 0; i < parameters.Length; i++)
+      var ctor = constructorInfos[0];
+      var parameters = ctor.GetParameters();
+      var convertedArgs = new object[ctorArgs.Count];
+      for (var i = 0; i < parameters.Length; i++)
       {
         convertedArgs[i] = ctorArgs[i];
       }
@@ -285,23 +233,27 @@ namespace Xaml
     /// Как только встречается один из этих символов без экранирования обратным слешем,
     /// парсинг прекращается.
     /// </summary>
-    private string processString()
+    private string ProcessString()
     {
-      StringBuilder sb = new StringBuilder();
-      bool escaping = false;
+      var sb = new StringBuilder();
+      var escaping = false;
       for (;;)
       {
-        if (!hasNextChar())
+        if (!HasNextChar())
         {
-          if (escaping) throw new InvalidOperationException("Invalid syntax.");
+          if (escaping)
+          {
+            throw new InvalidOperationException("Invalid syntax.");
+          }
+
           break;
         }
 
-        char c = peekNextChar();
+        var c = PeekNextChar();
         if (escaping)
         {
           sb.Append(c);
-          consumeChar();
+          ConsumeChar();
           escaping = false;
         }
         else
@@ -309,7 +261,7 @@ namespace Xaml
           if (c == '\\')
           {
             escaping = true;
-            consumeChar();
+            ConsumeChar();
           }
           else
           {
@@ -321,7 +273,7 @@ namespace Xaml
             else
             {
               sb.Append(c);
-              consumeChar();
+              ConsumeChar();
             }
           }
         }
@@ -330,18 +282,18 @@ namespace Xaml
       return sb.ToString();
     }
 
-    private string processQualifiedName()
+    private string ProcessQualifiedName()
     {
-      StringBuilder sb = new StringBuilder();
+      var sb = new StringBuilder();
       for (;;)
       {
-        char c = peekNextChar();
+        var c = PeekNextChar();
         if (c != ':' && !Char.IsLetterOrDigit(c))
         {
           break;
         }
 
-        consumeChar();
+        ConsumeChar();
         sb.Append(c);
       }
 
