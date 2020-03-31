@@ -88,7 +88,7 @@ namespace ConsoleFramework.Controls
           }
         }
 
-        foreach (Control child in base.Children)
+        foreach (var child in base.Children)
         {
           child.Measure(new Size(child.DesiredSize.Width, maxHeight));
         }
