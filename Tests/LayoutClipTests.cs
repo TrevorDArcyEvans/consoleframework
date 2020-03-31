@@ -47,7 +47,7 @@ namespace Tests
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 MaxWidth = 3,
                 LayoutInfo = new LayoutInfo {
-                    renderSize = new Size(10, 1)
+                    RenderSize = new Size(10, 1)
                 }
             };
             Rect layoutClip = control.ApplyMaxConstraints(new Rect(-10, -10, 20, 20));
