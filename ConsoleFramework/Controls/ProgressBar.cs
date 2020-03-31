@@ -7,6 +7,7 @@ namespace ConsoleFramework.Controls
   public class ProgressBar : Control
   {
     private int _percent;
+
     /// <summary>
     /// Percent (from 0 to 100).
     /// </summary>
