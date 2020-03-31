@@ -66,13 +66,13 @@ namespace ConsoleFramework.Controls
       _listBox.SelectedItemIndexChanged += (sender, args) => { this.RaisePropertyChanged("SelectedItem"); };
     }
 
-    private void subscribeToItem(TreeItem item, ListChangedHandler handler)
+    private void SubscribeToItem(TreeItem item, ListChangedHandler handler)
     {
       item._items.ListChanged += handler;
       item.PropertyChanged += ItemOnPropertyChanged;
       foreach (var child in item._items)
       {
-        subscribeToItem(child, handler);
+        SubscribeToItem(child, handler);
       }
     }
 
@@ -162,7 +162,7 @@ namespace ConsoleFramework.Controls
       }
 
       // Handle modification of inner list recursively
-      subscribeToItem(treeItem, ItemsOnListChanged);
+      SubscribeToItem(treeItem, ItemsOnListChanged);
       if (treeItem.Position <= _listBox.SelectedItemIndex)
       {
         RaisePropertyChanged("SelectedItem");
@@ -202,15 +202,21 @@ namespace ConsoleFramework.Controls
       {
         case ListChangedEventType.ItemsInserted:
         {
-          for (int i = 0; i < args.Count; i++)
+          for (var i = 0; i < args.Count; i++)
+          {
             OnItemInserted(i + args.Index);
+          }
+
           break;
         }
 
         case ListChangedEventType.ItemsRemoved:
         {
-          foreach (TreeItem treeItem in args.RemovedItems.Cast<TreeItem>())
+          foreach (var treeItem in args.RemovedItems.Cast<TreeItem>())
+          {
             OnItemRemoved(treeItem);
+          }
+
           break;
         }
 
