@@ -70,7 +70,7 @@ namespace TestProject1.Binding
             Assert.True( source.SourceInt == 5 );
             target.TargetStr = "invalid int";
             Assert.True(source.SourceInt == 0);
-            Assert.True( lastResult.hasConversionError );
+            Assert.True( lastResult.HasConversionError );
         }
     }
 }
