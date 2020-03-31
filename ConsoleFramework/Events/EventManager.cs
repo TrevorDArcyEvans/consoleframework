@@ -14,7 +14,7 @@ namespace ConsoleFramework.Events
   /// </summary>
   public sealed class EventManager
   {
-    private readonly Stack<Control> inputCaptureStack = new Stack<Control>();
+    private readonly Stack<Control> _inputCaptureStack = new Stack<Control>();
 
     private class DelegateInfo
     {
@@ -52,7 +52,7 @@ namespace ConsoleFramework.Events
       }
     }
 
-    private static readonly Dictionary<RoutedEventKey, RoutedEventInfo> routedEvents = new Dictionary<RoutedEventKey, RoutedEventInfo>();
+    private static readonly Dictionary<RoutedEventKey, RoutedEventInfo> _routedEvents = new Dictionary<RoutedEventKey, RoutedEventInfo>();
 
     public static RoutedEvent RegisterRoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
     {
@@ -72,14 +72,14 @@ namespace ConsoleFramework.Events
       }
 
       var key = new RoutedEventKey(name, ownerType);
-      if (routedEvents.ContainsKey(key))
+      if (_routedEvents.ContainsKey(key))
       {
         throw new InvalidOperationException("This routed event is already registered.");
       }
 
       var routedEvent = new RoutedEvent(handlerType, name, ownerType, routingStrategy);
       var routedEventInfo = new RoutedEventInfo(routedEvent);
-      routedEvents.Add(key, routedEventInfo);
+      _routedEvents.Add(key, routedEventInfo);
       return routedEvent;
     }
 
@@ -106,12 +106,12 @@ namespace ConsoleFramework.Events
       }
 
       var key = routedEvent.Key;
-      if (!routedEvents.ContainsKey(key))
+      if (!_routedEvents.ContainsKey(key))
       {
         throw new ArgumentException("Specified routed event is not registered.", "routedEvent");
       }
 
-      var routedEventInfo = routedEvents[key];
+      var routedEventInfo = _routedEvents[key];
       var needAddTarget = true;
       if (routedEventInfo.targetsList != null)
       {
@@ -160,12 +160,12 @@ namespace ConsoleFramework.Events
       }
 
       var key = routedEvent.Key;
-      if (!routedEvents.ContainsKey(key))
+      if (!_routedEvents.ContainsKey(key))
       {
         throw new ArgumentException("Specified routed event is not registered.", "routedEvent");
       }
 
-      var routedEventInfo = routedEvents[key];
+      var routedEventInfo = _routedEvents[key];
       if (routedEventInfo.targetsList == null)
       {
         throw new InvalidOperationException("Targets list is empty.");
@@ -202,12 +202,12 @@ namespace ConsoleFramework.Events
       }
 
       var key = routedEvent.Key;
-      if (!routedEvents.ContainsKey(key))
+      if (!_routedEvents.ContainsKey(key))
       {
         throw new ArgumentException("Specified routed event is not registered.", "routedEvent");
       }
 
-      var routedEventInfo = routedEvents[key];
+      var routedEventInfo = _routedEvents[key];
       return routedEventInfo.targetsList;
     }
 
@@ -218,7 +218,7 @@ namespace ConsoleFramework.Events
         throw new ArgumentNullException("control");
       }
 
-      inputCaptureStack.Push(control);
+      _inputCaptureStack.Push(control);
     }
 
     public void EndCaptureInput(Control control)
@@ -228,17 +228,17 @@ namespace ConsoleFramework.Events
         throw new ArgumentNullException("control");
       }
 
-      if (inputCaptureStack.Peek() != control)
+      if (_inputCaptureStack.Peek() != control)
       {
         throw new InvalidOperationException("Last control captured the input differs from specified in argument.");
       }
 
-      inputCaptureStack.Pop();
+      _inputCaptureStack.Pop();
     }
 
     private readonly Queue<RoutedEventArgs> _eventsQueue = new Queue<RoutedEventArgs>();
 
-    private MouseButtonState getLeftButtonState(MOUSE_BUTTON_STATE rawState)
+    private static MouseButtonState GetLeftButtonState(MOUSE_BUTTON_STATE rawState)
     {
       return (rawState & MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED) ==
              MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED
@@ -246,7 +246,7 @@ namespace ConsoleFramework.Events
         : MouseButtonState.Released;
     }
 
-    private MouseButtonState getMiddleButtonState(MOUSE_BUTTON_STATE rawState)
+    private static MouseButtonState GetMiddleButtonState(MOUSE_BUTTON_STATE rawState)
     {
       return (rawState & MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED) ==
              MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED
@@ -254,7 +254,7 @@ namespace ConsoleFramework.Events
         : MouseButtonState.Released;
     }
 
-    private MouseButtonState getRightButtonState(MOUSE_BUTTON_STATE rawState)
+    private static MouseButtonState GetRightButtonState(MOUSE_BUTTON_STATE rawState)
     {
       return (rawState & MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED) ==
              MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED
@@ -346,16 +346,16 @@ namespace ConsoleFramework.Events
         // события, связанные с нажатием мыши - тоже доставляются только ему, вместо того
         // контрола, над которым событие было зарегистрировано. Такой механизм необходим,
         // например, для корректной обработки перемещений окон (вверх или в стороны)
-        var source = (inputCaptureStack.Count != 0) ? inputCaptureStack.Peek() : topMost;
+        var source = (_inputCaptureStack.Count != 0) ? _inputCaptureStack.Peek() : topMost;
 
         // No sense to further process event with no source control
         if (source == null) return;
 
         if (mouseEvent.dwEventFlags == MouseEventFlags.MOUSE_MOVED)
         {
-          MouseButtonState leftMouseButtonState = getLeftButtonState(mouseEvent.dwButtonState);
-          MouseButtonState middleMouseButtonState = getMiddleButtonState(mouseEvent.dwButtonState);
-          MouseButtonState rightMouseButtonState = getRightButtonState(mouseEvent.dwButtonState);
+          MouseButtonState leftMouseButtonState = GetLeftButtonState(mouseEvent.dwButtonState);
+          MouseButtonState middleMouseButtonState = GetMiddleButtonState(mouseEvent.dwButtonState);
+          MouseButtonState rightMouseButtonState = GetRightButtonState(mouseEvent.dwButtonState);
           //
           MouseEventArgs mouseEventArgs = new MouseEventArgs(source, Control.PreviewMouseMoveEvent,
             rawPosition,
@@ -420,9 +420,9 @@ namespace ConsoleFramework.Events
 
         if (mouseEvent.dwEventFlags == MouseEventFlags.PRESSED_OR_RELEASED)
         {
-          var leftMouseButtonState = getLeftButtonState(mouseEvent.dwButtonState);
-          var middleMouseButtonState = getMiddleButtonState(mouseEvent.dwButtonState);
-          var rightMouseButtonState = getRightButtonState(mouseEvent.dwButtonState);
+          var leftMouseButtonState = GetLeftButtonState(mouseEvent.dwButtonState);
+          var middleMouseButtonState = GetMiddleButtonState(mouseEvent.dwButtonState);
+          var rightMouseButtonState = GetRightButtonState(mouseEvent.dwButtonState);
 
           MouseButtonEventArgs eventArgs = null;
           if (leftMouseButtonState != _lastLeftMouseButtonState)
@@ -502,8 +502,8 @@ namespace ConsoleFramework.Events
 
       if (inputRecord.EventType == EventType.KEY_EVENT)
       {
-        KEY_EVENT_RECORD keyEvent = inputRecord.KeyEvent;
-        KeyEventArgs eventArgs = new KeyEventArgs(
+        var keyEvent = inputRecord.KeyEvent;
+        var eventArgs = new KeyEventArgs(
           ConsoleApplication.Instance.FocusManager.FocusedElement,
           keyEvent.bKeyDown ? Control.PreviewKeyDownEvent : Control.PreviewKeyUpEvent);
         eventArgs.UnicodeChar = keyEvent.UnicodeChar;
@@ -523,30 +523,14 @@ namespace ConsoleFramework.Events
     {
       while (_eventsQueue.Count != 0)
       {
-        RoutedEventArgs routedEventArgs = _eventsQueue.Dequeue();
-        processRoutedEvent(routedEventArgs.RoutedEvent, routedEventArgs);
+        var routedEventArgs = _eventsQueue.Dequeue();
+        ProcessRoutedEvent(routedEventArgs.RoutedEvent, routedEventArgs);
       }
     }
 
     public bool IsQueueEmpty()
     {
       return _eventsQueue.Count == 0;
-    }
-
-    // todo : think about remove it
-    internal bool ProcessRoutedEvent(RoutedEvent routedEvent, RoutedEventArgs args)
-    {
-      if (null == routedEvent)
-      {
-        throw new ArgumentNullException("routedEvent");
-      }
-
-      if (null == args)
-      {
-        throw new ArgumentNullException("args");
-      }
-
-      return processRoutedEvent(routedEvent, args);
     }
 
     private static bool IsControlAllowedToReceiveEvents(Control control, Control capturingControl)
@@ -568,13 +552,21 @@ namespace ConsoleFramework.Events
       }
     }
 
-    private bool processRoutedEvent(RoutedEvent routedEvent, RoutedEventArgs args)
+    internal bool ProcessRoutedEvent(RoutedEvent routedEvent, RoutedEventArgs args)
     {
-      //
+      if (null == routedEvent)
+      {
+        throw new ArgumentNullException("routedEvent");
+      }
+
+      if (null == args)
+      {
+        throw new ArgumentNullException("args");
+      }
+
       var subscribedTargets = GetTargetsSubscribedTo(routedEvent);
 
-      Control capturingControl = inputCaptureStack.Count != 0 ? inputCaptureStack.Peek() : null;
-      //
+      var capturingControl = _inputCaptureStack.Count != 0 ? _inputCaptureStack.Peek() : null;
       if (routedEvent.RoutingStrategy == RoutingStrategy.Direct)
       {
         if (null == subscribedTargets)
@@ -582,7 +574,6 @@ namespace ConsoleFramework.Events
           return false;
         }
 
-        //
         var targetInfo = subscribedTargets.FirstOrDefault(info => info.target == args.Source);
         if (null == targetInfo)
         {
@@ -755,11 +746,9 @@ namespace ConsoleFramework.Events
           for (var i = path.Count - 1; i >= 0; i--)
           {
             var target = path[i];
-            var targetInfo =
-              subscribedTargets.FirstOrDefault(info => info.target == target);
+            var targetInfo = subscribedTargets.FirstOrDefault(info => info.target == target);
             if (null != targetInfo)
             {
-              //
               foreach (var delegateInfo in new List<DelegateInfo>(targetInfo.handlersList))
               {
                 if (!args.Handled || delegateInfo.handledEventsToo)
