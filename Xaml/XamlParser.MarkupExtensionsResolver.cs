@@ -6,16 +6,16 @@ namespace Xaml
   {
     private class MarkupExtensionsResolver : IMarkupExtensionsResolver
     {
-      private readonly XamlParser self;
+      private readonly XamlParser _self;
 
       public MarkupExtensionsResolver(XamlParser self)
       {
-        this.self = self;
+        this._self = self;
       }
 
       public Type Resolve(string name)
       {
-        return self.ResolveMarkupExtensionType(name);
+        return _self.ResolveMarkupExtensionType(name);
       }
     }
   }
