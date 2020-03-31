@@ -139,10 +139,10 @@ namespace ConsoleFramework.Rendering
       // Raise all invalidated and revalidated events of affected controls with subscribers
       foreach (ControlAffectInfo affectInfo in affectedControls)
       {
-        if (affectInfo.affectType == AffectType.LayoutInvalidated)
-          affectInfo.control.RaiseInvalidatedEvent();
-        else if (affectInfo.affectType == AffectType.LayoutRevalidated)
-          affectInfo.control.RaiseRevalidatedEvent();
+        if (affectInfo.AffectType == AffectType.LayoutInvalidated)
+          affectInfo.Control.RaiseInvalidatedEvent();
+        else if (affectInfo.AffectType == AffectType.LayoutRevalidated)
+          affectInfo.Control.RaiseRevalidatedEvent();
       }
 
       // Перебираем zOrderCheckControls, для каждого контрола проверяя все его дочерние -

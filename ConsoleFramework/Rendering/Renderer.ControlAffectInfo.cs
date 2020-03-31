@@ -6,13 +6,13 @@ namespace ConsoleFramework.Rendering
   {
     private struct ControlAffectInfo
     {
-      public readonly Control control;
-      public readonly AffectType affectType;
+      public readonly Control Control;
+      public readonly AffectType AffectType;
 
       public ControlAffectInfo(Control control, AffectType affectType)
       {
-        this.control = control;
-        this.affectType = affectType;
+        this.Control = control;
+        this.AffectType = affectType;
       }
     }
   }
