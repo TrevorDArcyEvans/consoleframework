@@ -11,26 +11,28 @@ namespace ConsoleFramework.Controls
 {
   public class Menu : Control
   {
-    private readonly ObservableList<MenuItemBase> items = new ObservableList<MenuItemBase>(
-      new List<MenuItemBase>());
+    private readonly ObservableList<MenuItemBase> _items = new ObservableList<MenuItemBase>(new List<MenuItemBase>());
 
     public IList<MenuItemBase> Items
     {
-      get { return items; }
+      get { return _items; }
     }
 
-    private void getGestures(MenuItem item, Dictionary<KeyGesture, MenuItem> map)
+    private void GetGestures(MenuItem item, Dictionary<KeyGesture, MenuItem> map)
     {
       if (item.Gesture != null)
+      {
         map.Add(item.Gesture, item);
+      }
+
       if (item.Type == MenuItemType.RootSubmenu ||
           item.Type == MenuItemType.Submenu)
       {
-        foreach (MenuItemBase itemBase in item.Items)
+        foreach (var itemBase in item.Items)
         {
           if (itemBase is MenuItem)
           {
-            getGestures((MenuItem) itemBase, map);
+            GetGestures((MenuItem) itemBase, map);
           }
         }
       }
@@ -38,40 +40,40 @@ namespace ConsoleFramework.Controls
 
     public void RefreshKeyGestures()
     {
-      gestures = null;
+      _gestures = null;
     }
 
-    private Dictionary<KeyGesture, MenuItem> gestures;
+    private Dictionary<KeyGesture, MenuItem> _gestures;
 
-    private Dictionary<KeyGesture, MenuItem> getGesturesMap()
+    private Dictionary<KeyGesture, MenuItem> GetGesturesMap()
     {
-      if (gestures == null)
+      if (_gestures == null)
       {
-        gestures = new Dictionary<KeyGesture, MenuItem>();
-        foreach (MenuItemBase itemBase in this.Items)
+        _gestures = new Dictionary<KeyGesture, MenuItem>();
+        foreach (var itemBase in this.Items)
         {
           if (itemBase is MenuItem)
           {
-            getGestures((MenuItem) itemBase, gestures);
+            GetGestures((MenuItem) itemBase, _gestures);
           }
         }
       }
 
-      return gestures;
+      return _gestures;
     }
 
     public bool TryMatchGesture(KeyEventArgs args)
     {
-      Dictionary<KeyGesture, MenuItem> map = getGesturesMap();
+      Dictionary<KeyGesture, MenuItem> map = GetGesturesMap();
       KeyGesture match = map.Keys.FirstOrDefault(gesture => gesture.Matches(args));
       if (match == null) return false;
 
       this.CloseAllSubmenus();
 
       // Activate matches menu item
-      MenuItem menuItem = map[match];
-      List<MenuItem> path = new List<MenuItem>();
-      MenuItem currentItem = menuItem;
+      var menuItem = map[match];
+      var path = new List<MenuItem>();
+      var currentItem = menuItem;
       while (currentItem != null)
       {
         path.Add(currentItem);
@@ -81,13 +83,13 @@ namespace ConsoleFramework.Controls
       path.Reverse();
 
       // Open all menu _items in path successively
-      int i = 0;
+      var i = 0;
       Action action = null;
-      action = new Action(() =>
+      action = () =>
       {
         if (i < path.Count)
         {
-          MenuItem item = path[i];
+          var item = path[i];
           if (item.Type == MenuItemType.Item)
           {
             item.RaiseClick();
@@ -102,8 +104,7 @@ namespace ConsoleFramework.Controls
           else
           {
             // Set focus to PopupWindow -> item
-            ConsoleApplication.Instance.FocusManager.SetFocus(
-              item.Parent.Parent, item);
+            ConsoleApplication.Instance.FocusManager.SetFocus(item.Parent.Parent, item);
           }
 
           item.Invalidate();
@@ -122,7 +123,7 @@ namespace ConsoleFramework.Controls
           };
           item.LayoutRevalidated += handler;
         }
-      });
+      };
       action();
 
       return true;
@@ -133,14 +134,12 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public void CloseAllSubmenus()
     {
-      List<MenuItem> expandedSubmenus = new List<MenuItem>();
-      MenuItem currentItem = (MenuItem) this.Items.SingleOrDefault(
-        item => item is MenuItem && ((MenuItem) item).expanded);
+      var expandedSubmenus = new List<MenuItem>();
+      var currentItem = (MenuItem) this.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).expanded);
       while (null != currentItem)
       {
         expandedSubmenus.Add(currentItem);
-        currentItem = (MenuItem) currentItem.Items.SingleOrDefault(
-          item => item is MenuItem && ((MenuItem) item).expanded);
+        currentItem = (MenuItem) currentItem.Items.SingleOrDefault(item => item is MenuItem && ((MenuItem) item).expanded);
       }
 
       expandedSubmenus.Reverse();
@@ -152,40 +151,57 @@ namespace ConsoleFramework.Controls
 
     public Menu()
     {
-      Panel stackPanel = new Panel();
+      var stackPanel = new Panel();
       stackPanel.Orientation = Orientation.Horizontal;
       this.AddChild(stackPanel);
 
       // Subscribe to Items change and add to Children them
-      this.items.ListChanged += (sender, args) =>
+      this._items.ListChanged += (sender, args) =>
       {
         switch (args.Type)
         {
           case ListChangedEventType.ItemsInserted:
           {
-            for (int i = 0; i < args.Count; i++)
+            for (var i = 0; i < args.Count; i++)
             {
-              MenuItemBase item = items[args.Index + i];
+              var item = _items[args.Index + i];
               if (item is Separator)
+              {
                 throw new InvalidOperationException("Separator cannot be added to root menu.");
+              }
+
               if (((MenuItem) item).Type == MenuItemType.Submenu)
+              {
                 ((MenuItem) item).Type = MenuItemType.RootSubmenu;
+              }
+
               stackPanel.Children.Insert(args.Index + i, item);
             }
 
             break;
           }
+
           case ListChangedEventType.ItemsRemoved:
-            for (int i = 0; i < args.Count; i++)
+            for (var i = 0; i < args.Count; i++)
+            {
               stackPanel.Children.RemoveAt(args.Index);
+            }
+
             break;
+
           case ListChangedEventType.ItemReplaced:
           {
-            MenuItemBase item = items[args.Index];
+            var item = _items[args.Index];
             if (item is Separator)
+            {
               throw new InvalidOperationException("Separator cannot be added to root menu.");
+            }
+
             if (((MenuItem) item).Type == MenuItemType.Submenu)
+            {
               ((MenuItem) item).Type = MenuItemType.RootSubmenu;
+            }
+
             stackPanel.Children[args.Index] = item;
             break;
           }
@@ -193,9 +209,9 @@ namespace ConsoleFramework.Controls
       };
       this.IsFocusScope = true;
 
-      this.AddHandler(KeyDownEvent, new KeyEventHandler(onKeyDown));
-      this.AddHandler(PreviewMouseMoveEvent, new MouseEventHandler(onPreviewMouseMove));
-      this.AddHandler(PreviewMouseDownEvent, new MouseEventHandler(onPreviewMouseDown));
+      this.AddHandler(KeyDownEvent, new KeyEventHandler(OnKeyDown));
+      this.AddHandler(PreviewMouseMoveEvent, new MouseEventHandler(OnPreviewMouseMove));
+      this.AddHandler(PreviewMouseDownEvent, new MouseEventHandler(OnPreviewMouseDown));
     }
 
     protected override void OnParentChanged()
@@ -211,40 +227,43 @@ namespace ConsoleFramework.Controls
         // окна). И событие выбора пункта меню из всплывающего окошка может быть поймано 
         // в WindowsHost, но не в Menu. А нам нужно повесить обработчик, который закроет
         // все показанные попапы.
-        EventManager.AddHandler(Parent, MenuItem.ClickEvent,
-          new RoutedEventHandler((sender, args) => CloseAllSubmenus()), true);
+        EventManager.AddHandler(Parent, MenuItem.ClickEvent, new RoutedEventHandler((sender, args) => CloseAllSubmenus()), true);
 
         EventManager.AddHandler(Parent, Popup.ControlKeyPressedEvent,
           new KeyEventHandler((sender, args) =>
           {
             CloseAllSubmenus();
-            //
+
             ConsoleApplication.Instance.FocusManager.SetFocusScope(this);
             if (args.VirtualKeyCode == VirtualKeys.Right)
+            {
               ConsoleApplication.Instance.FocusManager.MoveFocusNext();
+            }
             else if (args.VirtualKeyCode == VirtualKeys.Left)
+            {
               ConsoleApplication.Instance.FocusManager.MoveFocusPrev();
-            MenuItem focusedItem = (MenuItem) this.Items.SingleOrDefault(
-              item => item is MenuItem && item.HasFocus);
+            }
+
+            var focusedItem = (MenuItem) this.Items.SingleOrDefault(item => item is MenuItem && item.HasFocus);
             focusedItem.Expand();
           }));
       }
     }
 
-    private void onPreviewMouseMove(object sender, MouseEventArgs args)
+    private void OnPreviewMouseMove(object sender, MouseEventArgs args)
     {
       if (args.LeftButton == MouseButtonState.Pressed)
       {
-        onPreviewMouseDown(sender, args);
+        OnPreviewMouseDown(sender, args);
       }
     }
 
-    private void onPreviewMouseDown(object sender, MouseEventArgs e)
+    private void OnPreviewMouseDown(object sender, MouseEventArgs e)
     {
       PassFocusToChildUnderPoint(e);
     }
 
-    private void onKeyDown(object sender, KeyEventArgs args)
+    private static void OnKeyDown(object sender, KeyEventArgs args)
     {
       if (args.VirtualKeyCode == VirtualKeys.Right)
       {
@@ -273,7 +292,7 @@ namespace ConsoleFramework.Controls
 
     public override void Render(RenderingBuffer buffer)
     {
-      Attr attr = Colors.Blend(Color.Black, Color.Gray);
+      var attr = Colors.Blend(Color.Black, Color.Gray);
       buffer.FillRectangle(0, 0, ActualWidth, ActualHeight, ' ', attr);
     }
   }
