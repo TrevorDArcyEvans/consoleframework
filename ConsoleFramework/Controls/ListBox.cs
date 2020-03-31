@@ -139,7 +139,7 @@ namespace ConsoleFramework.Controls
       }
       else
       {
-        pageDownCore(2);
+        PageDownCore(2);
       }
 
       args.Handled = true;
@@ -257,7 +257,7 @@ namespace ConsoleFramework.Controls
           null));
     }
 
-    private void pageDownCore(int? pageSize)
+    private void PageDownCore(int? pageSize)
     {
       if (AllItemsAreDisabled)
       {
@@ -317,7 +317,7 @@ namespace ConsoleFramework.Controls
 
       if (args.VirtualKeyCode == VirtualKeys.PageDown)
       {
-        pageDownCore(PageSize);
+        PageDownCore(PageSize);
       }
 
       if (args.VirtualKeyCode == VirtualKeys.Up)
