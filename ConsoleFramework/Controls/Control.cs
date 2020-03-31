@@ -187,7 +187,7 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public Size? MeasureArgument
     {
-      get { return LayoutInfo.validity != LayoutValidity.Nothing ? (Size?) LayoutInfo.measureArgument : null; }
+      get { return LayoutInfo.Validity != LayoutValidity.Nothing ? (Size?) LayoutInfo.MeasureArgument : null; }
     }
 
     /// <summary>
@@ -413,8 +413,8 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public Vector ActualOffset
     {
-      get { return LayoutInfo.actualOffset; }
-      private set { LayoutInfo.actualOffset = value; }
+      get { return LayoutInfo.ActualOffset; }
+      private set { LayoutInfo.ActualOffset = value; }
     }
 
     /// <summary>
@@ -424,9 +424,9 @@ namespace ConsoleFramework.Controls
     /// </summary>
     internal bool SetValidityToRender()
     {
-      if (LayoutInfo.validity != LayoutValidity.Render)
+      if (LayoutInfo.Validity != LayoutValidity.Render)
       {
-        LayoutInfo.validity = LayoutValidity.Render;
+        LayoutInfo.Validity = LayoutValidity.Render;
 
         return (LayoutRevalidated != null);
       }
@@ -509,8 +509,8 @@ namespace ConsoleFramework.Controls
 
     public Size DesiredSize
     {
-      get => LayoutInfo.desiredSize;
-      private set => LayoutInfo.desiredSize = value;
+      get => LayoutInfo.DesiredSize;
+      private set => LayoutInfo.DesiredSize = value;
     }
 
     private struct MinMax
@@ -613,16 +613,16 @@ namespace ConsoleFramework.Controls
         throw new ArgumentException("Negative width/height is not allowed");
       }
 
-      if (LayoutInfo.validity != LayoutValidity.Nothing)
+      if (LayoutInfo.Validity != LayoutValidity.Nothing)
       {
         return;
       }
 
-      LayoutInfo.measureArgument = availableSize;
+      LayoutInfo.MeasureArgument = availableSize;
 
       if (Visibility == Visibility.Collapsed)
       {
-        LayoutInfo.unclippedDesiredSize = Size.Empty;
+        LayoutInfo.UnclippedDesiredSize = Size.Empty;
         DesiredSize = Size.Empty;
         return;
       }
@@ -694,7 +694,7 @@ namespace ConsoleFramework.Controls
       //  because due to the layout protocol, arrange should be called 
       //  with constraints greater or equal to child's desired size
       //  returned from MeasureOverride.
-      LayoutInfo.unclippedDesiredSize = unclippedDesiredSize;
+      LayoutInfo.UnclippedDesiredSize = unclippedDesiredSize;
 
       DesiredSize = new Size(Math.Max(0, clippedDesiredWidth), Math.Max(0, clippedDesiredHeight));
 
@@ -760,7 +760,7 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public void Arrange(Rect finalRect)
     {
-      if (LayoutInfo.validity != LayoutValidity.Nothing)
+      if (LayoutInfo.Validity != LayoutValidity.Nothing)
       {
         return;
       }
@@ -769,8 +769,8 @@ namespace ConsoleFramework.Controls
       {
         RenderSlotRect = Rect.Empty;
         RenderSize = Size.Empty;
-        LayoutInfo.layoutClip = CalculateLayoutClip();
-        LayoutInfo.validity = LayoutValidity.MeasureAndArrange;
+        LayoutInfo.LayoutClip = CalculateLayoutClip();
+        LayoutInfo.Validity = LayoutValidity.MeasureAndArrange;
         return;
       }
 
@@ -803,7 +803,7 @@ namespace ConsoleFramework.Controls
       arrangeSize.Height = Math.Max(0, arrangeSize.Height - marginHeight);
 
       // Next, compare against unclipped, transformed size.
-      var unclippedDesiredSize = LayoutInfo.unclippedDesiredSize;
+      var unclippedDesiredSize = LayoutInfo.UnclippedDesiredSize;
 
       if (arrangeSize.Width < unclippedDesiredSize.Width)
       {
@@ -842,9 +842,9 @@ namespace ConsoleFramework.Controls
         this.ActualOffset = offset;
       }
 
-      LayoutInfo.layoutClip = CalculateLayoutClip();
+      LayoutInfo.LayoutClip = CalculateLayoutClip();
 
-      LayoutInfo.validity = LayoutValidity.MeasureAndArrange;
+      LayoutInfo.Validity = LayoutValidity.MeasureAndArrange;
     }
 
     public HorizontalAlignment HorizontalAlignment { get; set; }
@@ -858,8 +858,8 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public Size RenderSize
     {
-      get => LayoutInfo.renderSize;
-      private set => LayoutInfo.renderSize = value;
+      get => LayoutInfo.RenderSize;
+      private set => LayoutInfo.RenderSize = value;
     }
 
     /// <summary>
@@ -868,8 +868,8 @@ namespace ConsoleFramework.Controls
     /// </summary>
     public Rect RenderSlotRect
     {
-      get => LayoutInfo.renderSlotRect;
-      private set => LayoutInfo.renderSlotRect = value;
+      get => LayoutInfo.RenderSlotRect;
+      private set => LayoutInfo.RenderSlotRect = value;
     }
 
     private Rect CalculateLayoutClip()
@@ -899,7 +899,7 @@ namespace ConsoleFramework.Controls
     /// Все остальное будет обрезано в соответствии с установленными значениями свойств
     /// <see cref="Margin"/>, <see cref="HorizontalAlignment"/> и <see cref="VerticalAlignment"/>.
     /// </summary>
-    public Rect LayoutClip => LayoutInfo.layoutClip;
+    public Rect LayoutClip => LayoutInfo.LayoutClip;
 
     private Vector ComputeAlignmentOffset()
     {
@@ -1029,7 +1029,7 @@ namespace ConsoleFramework.Controls
     internal void ResetValidity(List<Control> affectedControls)
     {
       // Copy all calculated layout info into lastLayoutInfo
-      if (LayoutInfo.validity == LayoutValidity.Render)
+      if (LayoutInfo.Validity == LayoutValidity.Render)
       {
         LastLayoutInfo.CopyValuesFrom(LayoutInfo);
       }
