@@ -10,13 +10,13 @@ namespace Xaml
       public string PropertyName { get; private set; }
       public object Object { get; private set; }
       public object DataContext { get; private set; }
-      private readonly XamlParser self;
-      private readonly string expression;
+      private readonly XamlParser _self;
+      private readonly string _expression;
 
       public object GetObjectById(string id)
       {
         object value;
-        return self._objectsById.TryGetValue(id, out value) ? value : null;
+        return _self._objectsById.TryGetValue(id, out value) ? value : null;
       }
 
       /// <summary>
@@ -27,15 +27,18 @@ namespace Xaml
       /// </summary>
       public bool IsFixupTokenAvailable
       {
-        get { return self._objects.Count != 0; }
+        get { return _self._objects.Count != 0; }
       }
 
       public IFixupToken GetFixupToken(IEnumerable<string> ids)
       {
         if (!IsFixupTokenAvailable)
+        {
           throw new InvalidOperationException("Fixup tokens are not available now.");
-        FixupToken fixupToken = new FixupToken();
-        fixupToken.Expression = expression;
+        }
+
+        var fixupToken = new FixupToken();
+        fixupToken.Expression = _expression;
         fixupToken.PropertyName = PropertyName;
         fixupToken.Object = Object;
         fixupToken.DataContext = DataContext;
@@ -43,14 +46,15 @@ namespace Xaml
         return fixupToken;
       }
 
-      public MarkupExtensionContext(XamlParser self,
+      public MarkupExtensionContext(
+        XamlParser self,
         string expression,
         string propertyName,
         object obj,
         object dataContext)
       {
-        this.self = self;
-        this.expression = expression;
+        this._self = self;
+        this._expression = expression;
         PropertyName = propertyName;
         Object = obj;
         DataContext = dataContext;
