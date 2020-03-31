@@ -18,7 +18,7 @@ namespace ConsoleFramework.Controls
         captionAttrs = Colors.Blend(Color.Black, Color.DarkGreen);
       }
 
-      Attr buttonAttrs = captionAttrs;
+      var buttonAttrs = captionAttrs;
 
       buffer.SetOpacityRect(0, 0, ActualWidth, ActualHeight, 3);
 
