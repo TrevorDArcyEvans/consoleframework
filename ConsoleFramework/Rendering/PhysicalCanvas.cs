@@ -65,7 +65,7 @@ namespace ConsoleFramework.Rendering
     {
       get
       {
-        if (index < 0 || index >= _size._width)
+        if (index < 0 || index >= _size.Width)
         {
           throw new IndexOutOfRangeException("index exceeds specified buffer width.");
         }
