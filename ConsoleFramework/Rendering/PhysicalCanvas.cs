@@ -30,7 +30,7 @@ namespace ConsoleFramework.Rendering
     /// <summary>
     /// Buffer to marshal between application and Win32 API layer.
     /// </summary>
-    protected CHAR_INFO[,] _buffer;
+    private CHAR_INFO[,] _buffer;
 
     /// <summary>
     /// Indexers cache to avoid objects creation on every [][] call.
